@@ -93,9 +93,12 @@ fclean: clean
 	@echo "Deleting symbolic link \"libft_malloc.so\"."
 	$(RM) -f libft_malloc.so
 	@echo "\033[32m$(NAME) deleted.\033[0m\n"
-	@echo "Deleting lib content."
-	@$(MAKE) $(LIBFT) fclean
-	@echo "\033[32mLib content deleted.\033[0m\n"
+	@echo "Deleting test files."
+	$(RM) -f test1
+	@echo "\033[32mTest files deleted.\033[0m\n"
 
+libft:
+	@$(MAKE) $(LIBFT) fclean
+	@$(MAKE) $(LIBFT)
 
 re: fclean all

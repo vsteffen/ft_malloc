@@ -18,8 +18,8 @@
 # include <stdlib.h>
 # include <unistd.h>
 
-# define TINY 1024
-# define SMALL 4096
+# define TINY 1
+# define SMALL 16
 
 typedef struct			s_block_mem {
 	size_t				size;
@@ -44,6 +44,7 @@ void			show_alloc_mem();
 
 
 void			printsize(size_t n);
+void			print_addr(void *ptr);
 void			print_debug();
 
 #endif

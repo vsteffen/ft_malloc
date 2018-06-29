@@ -1,53 +1,133 @@
 #include "ft_malloc.h"
 
 int8_t			get_zone(size_t size_requested) {
-	if (size_requested * 100 <= TINY)
+	if ((size_requested * 100) + sizeof(t_block_mem) <= TINY * (size_t)getpagesize())
+		return 0;
+	if ((size_requested * 100) + sizeof(t_block_mem) <= SMALL * (size_t)getpagesize())
 		return 1;
-	if (size_requested * 100 <= SMALL)
-		return 2;
-	return 3;
+	return 2;
 }
 
 
-void			set_metadata(void *new_alloc, size_t size_requested) {
-	t_block_mem		*mem;
 
-	mem = (t_block_mem *)new_alloc;
+void			set_metadata(t_block_mem *mem, size_t size_requested, t_block_mem *next_block) {
 	mem->size = size_requested;
 	mem->size_used = size_requested;
 	mem->used = 1;
-	mem->next = NULL;
+	mem->next = next_block;
+
+	// ft_putstr("SET METADATA : ");
+	// print_addr((void *)mem);
+	// ft_putstr(" ---> ");
+	// printsize(mem->size);
+	// ft_putstr("\n");
 }
 
-void			*request_memory(size_t size_requested) {
+void			set_metadata_next_block(t_block_mem *mem, t_block_mem *next_block) {
+	mem->next = next_block;
+}
+
+
+void			*request_memory(size_t size_requested, int8_t zone) {
 	size_t		size_malloc;
 
-	size_malloc = getpagesize() * (((size_requested * 100 + sizeof(t_block_mem)) / getpagesize()) + 1);
+	if (zone == 0)
+		size_malloc = getpagesize() * TINY;
+	else if (zone == 1)
+		size_malloc = getpagesize() * SMALL;
+	else
+		size_malloc = size_requested + sizeof(t_block_mem);
 	return mmap(0, size_malloc, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
 }
 
-void			print_debug() {
-	t_block_mem		*mem;
+void			*create_new_page(size_t size_requested, int8_t zone)
+{
+	void		*new_page;
 
-	mem = g_mem[0];
-	ft_putstr("\n ---> ");
-	printsize(mem->size);
+	new_page = request_memory(size_requested, zone);
+	if (new_page == (void *) -1)
+		return NULL;
+	set_metadata((t_block_mem*)new_page, size_requested, NULL);
+	return (new_page);
+}
+
+void			*find_next_mem_large(t_block_mem **mem) {
+	while (*mem != NULL)
+	{
+		mem = &(*mem)->next;
+	}
+	ft_putstr("Last addr in large :");
+	print_addr(*mem);
 	ft_putstr("\n");
+	return ((void *)(*mem));
+}
+
+void			*find_next_mem_tn_sm(t_block_mem **mem, size_t size_requested, int8_t zone) {
+	t_block_mem		**before;
+	size_t			size_page;
+	size_t			size_used_total;
+
+	(void)size_requested;
+	if (zone == 0)
+		size_page = getpagesize() * TINY;
+	else
+		size_page = getpagesize() * SMALL;
+	before = mem;
+	size_used_total = (*mem)->size + sizeof(t_block_mem);
+	mem = &(*mem)->next;
+	while (*mem != NULL)
+	{
+		if (size_used_total > size_page)
+			size_used_total = (*mem)->size + sizeof(t_block_mem);
+		if ((*mem)->used == 0) {
+			// when somewhere have enough space to rewrite
+			if (size_requested + sizeof(t_block_mem) + size_used_total <= size_page)
+			{
+				set_metadata((*mem), size_requested, (*mem)->next);
+				return (void *)(*mem);
+			}
+		}
+		size_used_total = size_used_total + (*mem)->size + sizeof(t_block_mem);
+		before = mem;
+		mem = &(*mem)->next;
+	}
+	if (size_used_total + size_requested + sizeof(t_block_mem) > size_page)
+	{
+		ft_putstr("CHECKPOINT 2\n");
+		// create new page
+
+		// void *ptr = create_new_page(size_requested, zone);
+		// set_metadata_next_block((void *)(*before), (t_block_mem *)ptr);
+		// return (ptr);
+
+		return (create_new_page(size_requested, zone));
+	}
+	// ft_putstr("CHECKPOINT 4\n");
+	set_metadata((void *)(*before) + (sizeof(t_block_mem) + (*before)->size + 1), size_requested, NULL);
+	set_metadata_next_block((void *)(*before), (void *)(*before) + (sizeof(t_block_mem) + (*before)->size + 1));
+	return ((void *)(*before) + (sizeof(t_block_mem) + (*before)->size + 1));
 }
 
 void			*malloc(size_t size) {
-	void			*new_alloc;
+	void			*alloc_requested;
+	t_block_mem		**mem;
+	int8_t			zone;
 
-	// write(1, "ft_malloc called!\n", 18);
-	new_alloc = request_memory(size);
-	if (new_alloc == (void *) -1)
-		return NULL;
-	if (g_mem[0] == NULL)
+	zone = get_zone(size);
+	mem = &g_mem[zone];
+	if (*mem == NULL)
 	{
-		set_metadata(new_alloc, size);
-		g_mem[0] = (t_block_mem*)new_alloc;
+		alloc_requested = create_new_page(size, zone);
+		*mem = (t_block_mem*)alloc_requested;
 	}
-	// print_debug();
-	show_alloc_mem();
-	return new_alloc + sizeof(t_block_mem);
+	else
+	{
+		if (zone != 2)
+			alloc_requested = find_next_mem_tn_sm(mem, size, zone);
+		else
+			alloc_requested = find_next_mem_large(mem);
+	}
+	if (alloc_requested == NULL)
+		return NULL;
+	return alloc_requested + sizeof(t_block_mem);
 }

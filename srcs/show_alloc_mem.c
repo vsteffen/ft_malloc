@@ -62,13 +62,13 @@ void	print_mem(t_block_mem *mem, char *zone)
 		ft_putstr(zone);
 		ft_putstr(" : 0x");
 		print_addr((void *)mem);
-		printsize(mem->size);
+		ft_putchar('\n');
 		while (mem != NULL)
 		{
-			ft_putstr("\n0x");
-			print_addr((void *)mem);
+			ft_putstr("0x");
+			print_addr((void *)mem + sizeof(t_block_mem));
 			ft_putstr(" - 0x");
-			print_addr((void *)mem + mem->size);
+			print_addr((void *)mem + sizeof(t_block_mem) + mem->size);
 			ft_putstr(" : ");
 			printsize(mem->size);
 			ft_putstr(" octets\n");
@@ -86,5 +86,4 @@ void	show_alloc_mem() {
 	print_mem(g_mem[0], "TINY");
 	print_mem(g_mem[1], "SMALL");
 	print_mem(g_mem[2], "LARGE");
-
 }
