@@ -23,7 +23,6 @@
 
 typedef struct			s_block_mem {
 	size_t				size;
-	size_t				size_used;
 	int8_t				used;
 	struct s_block_mem	*next;
 }						t_block_mem;
@@ -45,6 +44,6 @@ void			show_alloc_mem();
 
 void			printsize(size_t n);
 void			print_addr(void *ptr);
-void			print_debug();
+void			print_debug(size_t debug, char *name);
 
 #endif

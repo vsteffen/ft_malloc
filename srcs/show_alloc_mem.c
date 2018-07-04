@@ -66,9 +66,9 @@ void	print_mem(t_block_mem *mem, char *zone)
 		while (mem != NULL)
 		{
 			ft_putstr("0x");
-			print_addr((void *)mem + sizeof(t_block_mem));
+			print_addr((void *)mem + sizeof(t_block_mem) + 1);
 			ft_putstr(" - 0x");
-			print_addr((void *)mem + sizeof(t_block_mem) + mem->size);
+			print_addr((void *)mem + sizeof(t_block_mem) + 1 + mem->size);
 			ft_putstr(" : ");
 			printsize(mem->size);
 			ft_putstr(" octets\n");
