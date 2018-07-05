@@ -25,7 +25,15 @@ typedef struct			s_block_mem {
 	size_t				size;
 	int8_t				used;
 	struct s_block_mem	*next;
+	// TODO
+	//int8_t			new_page;
+	// struct s_block_mem	*prev;
 }						t_block_mem;
+
+typedef struct			s_tuple_hole {
+	size_t				size_hole;
+	t_block_mem			*last_mem;
+}						t_tuple_hole;
 
 extern t_block_mem		*g_mem[3];
 
@@ -41,8 +49,10 @@ void			*realloc(void *ptr, size_t size);
 
 void			show_alloc_mem();
 
+int8_t			get_zone(size_t size_requested);
 
-void			printsize(size_t n);
+
+void			print_size(size_t n);
 void			print_addr(void *ptr);
 void			print_debug(size_t debug, char *name);
 

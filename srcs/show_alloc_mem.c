@@ -45,12 +45,12 @@ void	print_addr(void *ptr) {
 	munmap(ptr, 0);
 }
 
-void		printsize(size_t n)
+void		print_size(size_t n)
 {
 	if (n >= 10)
 	{
-		printsize(n / 10);
-		printsize(n % 10);
+		print_size(n / 10);
+		print_size(n % 10);
 	}
 	else
 		ft_putchar(n + '0');
@@ -65,13 +65,16 @@ void	print_mem(t_block_mem *mem, char *zone)
 		ft_putchar('\n');
 		while (mem != NULL)
 		{
-			ft_putstr("0x");
-			print_addr((void *)mem + sizeof(t_block_mem) + 1);
-			ft_putstr(" - 0x");
-			print_addr((void *)mem + sizeof(t_block_mem) + 1 + mem->size);
-			ft_putstr(" : ");
-			printsize(mem->size);
-			ft_putstr(" octets\n");
+			if (mem->used == 1)
+			{
+				ft_putstr("0x");
+				print_addr((void *)mem + sizeof(t_block_mem));
+				ft_putstr(" - 0x");
+				print_addr((void *)mem + sizeof(t_block_mem) + mem->size);
+				ft_putstr(" : ");
+				print_size(mem->size);
+				ft_putstr(" octets\n");
+			}
 			mem = mem->next;
 		}
 	}
