@@ -13,17 +13,17 @@ int			main(int ac, char **av)
 	ptr3 = malloc(3);
 
 	free(ptr2);
-	// ptr2 = malloc(3);
+	ptr2 = malloc(2);
 
 	// ptr = malloc(3);
 	// ptr = malloc(40);
-	// for (int i = 0; i < 10000; i++)
-	// {
-	// 	// ptr = malloc(40);
-	// 	// if (i == 61)
-	// 		// show_alloc_mem();
-	// 	ptr = malloc(16);
-	// }
+	for (int i = 0; i < 10000; i++)
+	{
+		// ptr = malloc(40);
+		// if (i == 61)
+			// show_alloc_mem();
+		ptr1 = malloc(16);
+	}
 	show_alloc_mem();
 	return (0);
 }
@@ -41,6 +41,11 @@ t_block_mem = 24
 first alloc -> user data located in 0x18
 deb metadata second alloc 0x19
 deb user next alloc 0x31
+
+0x10345A018 - 0x10345A019 : 1 octets
+0x10345A031 - 0x10345A033 : 2 octets
+0x10345A04B - 0x10345A04E : 3 octets
+0x10345A066 - 0x10345A068 : 2 octets
 
 10670A000
 10676CFC8

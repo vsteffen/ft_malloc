@@ -26,8 +26,8 @@ typedef struct			s_block_mem {
 	int8_t				used;
 	struct s_block_mem	*next;
 	// TODO
-	//int8_t			new_page;
-	// struct s_block_mem	*prev;
+	int8_t				new_page;
+	struct s_block_mem	*prev;
 }						t_block_mem;
 
 typedef struct			s_tuple_hole {

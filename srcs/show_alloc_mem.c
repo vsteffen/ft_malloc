@@ -56,6 +56,36 @@ void		print_size(size_t n)
 		ft_putchar(n + '0');
 }
 
+void	print_mem_rev(t_block_mem *mem, char *zone)
+{
+	ft_putstr("+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\nReverse mode\n");
+	if (mem != NULL) {
+		ft_putstr(zone);
+		ft_putstr(" : 0x");
+		print_addr((void *)mem);
+		ft_putchar('\n');
+		while (mem != NULL)
+		{
+			if (mem->used == 1)
+			{
+				ft_putstr("0x");
+				print_addr((void *)mem + sizeof(t_block_mem));
+				ft_putstr(" - 0x");
+				print_addr((void *)mem + sizeof(t_block_mem) + mem->size);
+				ft_putstr(" : ");
+				print_size(mem->size);
+				ft_putstr(" octets\n");
+			}
+			mem = mem->prev;
+		}
+	}
+	else
+	{
+		ft_putstr(zone);
+		ft_putstr(" : not used\n");
+	}
+}
+
 void	print_mem(t_block_mem *mem, char *zone)
 {
 	if (mem != NULL) {
@@ -75,6 +105,10 @@ void	print_mem(t_block_mem *mem, char *zone)
 				print_size(mem->size);
 				ft_putstr(" octets\n");
 			}
+
+			// if (mem->next == NULL)
+			// 	print_mem_rev(mem, zone);
+
 			mem = mem->next;
 		}
 	}

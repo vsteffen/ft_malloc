@@ -16,9 +16,10 @@ int8_t			get_zone(size_t size_requested) {
 
 
 
-void			set_metadata(t_block_mem *mem, size_t size_requested, t_block_mem *next_block) {
+void			set_metadata(t_block_mem *mem, size_t size_requested, t_block_mem *prev_block, t_block_mem *next_block) {
 	mem->size = size_requested;
 	mem->used = 1;
+	mem->prev = prev_block;
 	mem->next = next_block;
 
 	// ft_putstr("SET METADATA : 0x");
@@ -30,6 +31,10 @@ void			set_metadata(t_block_mem *mem, size_t size_requested, t_block_mem *next_b
 
 void			set_metadata_next_block(t_block_mem *mem, t_block_mem *next_block) {
 	mem->next = next_block;
+}
+
+void			set_metadata_prev_block(t_block_mem *mem, t_block_mem *prev_block) {
+	mem->prev = prev_block;
 }
 
 
@@ -45,14 +50,17 @@ void			*request_memory(size_t size_requested, int8_t zone) {
 	return mmap(0, size_malloc, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
 }
 
-void			*create_new_page(size_t size_requested, int8_t zone)
+void			*create_new_page(size_t size_requested, int8_t zone, t_block_mem *prev)
 {
 	void		*new_page;
+	t_block_mem	*mem;
 
 	new_page = request_memory(size_requested, zone);
 	if (new_page == (void *) -1)
 		return NULL;
-	set_metadata((t_block_mem*)new_page, size_requested, NULL);
+	set_metadata((t_block_mem*)new_page, size_requested, prev, NULL);
+	mem = (t_block_mem*)new_page;
+	mem->new_page = 1;
 	return (new_page);
 }
 
@@ -88,7 +96,7 @@ size_t		search_size_hole(t_block_mem *mem) {
 	size_t	size_hole;
 
 	size_hole = 0;
-	while (mem)
+	while (mem && mem->used == 0)
 	{
 		size_hole += sizeof(t_block_mem) + mem->size;
 		if ((void*)mem + sizeof(t_block_mem) + mem->size != (void*)mem->next) // next malloc is in new page
@@ -103,7 +111,6 @@ void			*find_next_mem_tn_sm(t_block_mem **mem, size_t size_requested, int8_t zon
 	size_t			size_page;
 	size_t			size_used_total;
 	size_t			size_hole;
-	// t_tuple_hole	hole;
 
 	if (zone == 0)
 		size_page = getpagesize() * TINY;
@@ -119,11 +126,16 @@ void			*find_next_mem_tn_sm(t_block_mem **mem, size_t size_requested, int8_t zon
 		if ((*mem)->used == 0) {
 			// when somewhere have enough space to rewrite
 			size_hole = search_size_hole(*mem);
-			if ((void*)(*mem)->next != (void*)mem + size_hole)
-				set_metadata((void*)mem, size_hole - sizeof(t_block_mem), (void*)mem + size_hole);
-			if (size_hole - sizeof(t_block_mem) <= size_requested)
+
+			// set zone
+			// if ((void*)(*mem)->next != (void*)mem + size_hole)
+			// 	set_metadata((void*)mem, size_hole - sizeof(t_block_mem), (void*)mem + size_hole);
+			ft_putstr("Trying to refill hole left by free for new malloc\n");
+			if (size_hole >= size_requested + sizeof(t_block_mem))
 			{
-				set_metadata((void *)(*mem), size_requested, (*mem)->next);
+				ft_putstr("Reuse hole left by free for new malloc\n");
+				set_metadata((void *)(*mem), size_requested, *before, (*mem)->next);
+				(*mem)->used = 1;
 				return ((void *)(*mem));
 			}
 		}
@@ -134,17 +146,12 @@ void			*find_next_mem_tn_sm(t_block_mem **mem, size_t size_requested, int8_t zon
 	if (size_used_total + size_requested + sizeof(t_block_mem) > size_page)
 	{
 		ft_putstr("Creation of new page and return ptr on free space\n");
-		// print_debug(size_used_total, "size_used_total");
-		// create new page
-
-		void *ptr = create_new_page(size_requested, zone);
+		void *ptr = create_new_page(size_requested, zone, *before);
 		set_metadata_next_block((void *)(*before), (t_block_mem *)ptr);
 		return (ptr);
-
-		return (create_new_page(size_requested, zone));
 	}
 	// print_debug(size_used_total + sizeof(t_block_mem) + size_requested, "size_used_total");
-	set_metadata((void *)(*before) + (sizeof(t_block_mem) + (*before)->size), size_requested, NULL);
+	set_metadata((void *)(*before) + (sizeof(t_block_mem) + (*before)->size), size_requested, *before, NULL);
 	set_metadata_next_block((void *)(*before), (void *)(*before) + (sizeof(t_block_mem) + (*before)->size));
 	return ((void *)(*before) + (sizeof(t_block_mem) + (*before)->size));
 }
@@ -166,7 +173,7 @@ void			*malloc(size_t size) {
 	mem = &g_mem[zone];
 	if (*mem == NULL)
 	{
-		alloc_requested = create_new_page(size, zone);
+		alloc_requested = create_new_page(size, zone, NULL);
 		*mem = (t_block_mem*)alloc_requested;
 	}
 	else
