@@ -18,30 +18,27 @@
 # include <stdlib.h>
 # include <unistd.h>
 
-# define TINY 1
+# define TINY 2
 # define SMALL 16
+# define DEBUG 0
 
 typedef struct			s_block_mem {
 	size_t				size;
+	size_t				real_size;
 	int8_t				used;
 	struct s_block_mem	*next;
-	// TODO
 	int8_t				new_page;
 	struct s_block_mem	*prev;
+	struct s_block_mem	*prev1;
+	struct s_block_mem	*prev2;
+	struct s_block_mem	*prev3;
+	struct s_block_mem	*prev4;
+	struct s_block_mem	*prev5;
+	struct s_block_mem	*prev6;
+	struct s_block_mem	*prev7;
 }						t_block_mem;
 
-typedef struct			s_tuple_hole {
-	size_t				size_hole;
-	t_block_mem			*last_mem;
-}						t_tuple_hole;
-
 extern t_block_mem		*g_mem[3];
-
-// typedef struct		s_project {
-// 	t_elem			*elem;
-// 	t_elem			*current;
-// 	t_elem			*last;
-// }					t_project;
 
 void			free(void *ptr);
 void			*malloc(size_t size);
@@ -50,10 +47,15 @@ void			*realloc(void *ptr, size_t size);
 void			show_alloc_mem();
 
 int8_t			get_zone(size_t size_requested);
+void			set_metadata(t_block_mem *mem, size_t size_requested, t_block_mem *prev_block, t_block_mem *next_block);
+void			set_metadata_next_block(t_block_mem *mem, t_block_mem *next_block);
+void			set_metadata_prev_block(t_block_mem *mem, t_block_mem *prev_block);
 
+int8_t			isset_addr(void *ptr);
 
 void			print_size(size_t n);
 void			print_addr(void *ptr);
-void			print_debug(size_t debug, char *name);
+void			print_debug_size_t(size_t debug, char *name);
+void			print_debug_addr(void *debug, char *name);
 
 #endif
