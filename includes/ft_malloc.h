@@ -18,24 +18,16 @@
 # include <stdlib.h>
 # include <unistd.h>
 
-# define TINY 2
-# define SMALL 16
-# define DEBUG 0
+# define TINY 32
+# define SMALL 64
+# define DEBUG 1
 
 typedef struct			s_block_mem {
 	size_t				size;
-	size_t				real_size;
 	int8_t				used;
-	struct s_block_mem	*next;
 	int8_t				new_page;
+	struct s_block_mem	*next;
 	struct s_block_mem	*prev;
-	struct s_block_mem	*prev1;
-	struct s_block_mem	*prev2;
-	struct s_block_mem	*prev3;
-	struct s_block_mem	*prev4;
-	struct s_block_mem	*prev5;
-	struct s_block_mem	*prev6;
-	struct s_block_mem	*prev7;
 }						t_block_mem;
 
 extern t_block_mem		*g_mem[3];

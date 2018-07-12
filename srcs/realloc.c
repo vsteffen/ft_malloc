@@ -5,7 +5,7 @@ int8_t	isset_addr(void *ptr) {
 	int8_t			i;
 
 	i = 0;
-	while (i < 2)
+	while (i < 3)
 	{
 		mem = g_mem[i];
 		while (mem)
@@ -31,7 +31,7 @@ size_t	get_size_left_on_page(t_block_mem *mem) {
 	total_size = 0;
 	while (mem && mem->new_page == 0)
 	{
-		total_size += sizeof(t_block_mem) + mem->real_size;
+		total_size += sizeof(t_block_mem) + mem->size;
 		mem = mem->next;
 	}
 	if (get_zone(mem->size) == 0)
@@ -39,45 +39,47 @@ size_t	get_size_left_on_page(t_block_mem *mem) {
 	return ((getpagesize() * SMALL) - total_size);
 }
 
+void	*copy_in_new_malloc_and_free(t_block_mem *mem, void *ptr, size_t size)
+{
+	t_block_mem		*new_alloc;
+
+	new_alloc = (t_block_mem*)malloc(size);
+	ft_memcpy(new_alloc, (void*)mem, mem->size);
+	free(ptr);
+	return ((void*)new_alloc);
+}
+
 void	*realloc(void *ptr, size_t size) {
 	t_block_mem		*mem;
-	t_block_mem		*new_alloc;
 
 	print_debug_addr(ptr, "Realloc address");
 	print_debug_size_t(size, "Realloc size");
 	if (!ptr)
 		return (malloc(size));
 	if (isset_addr(ptr) == 0)
-		return (NULL);
+		return (malloc(size));
 	if (size == 0)
 		return (malloc(0));
 	mem = (t_block_mem *)(ptr - sizeof(t_block_mem));
-	if (get_zone(mem->size) < 2)
+	// don't forget realloc in new zone
+	if (get_zone(mem->size) != get_zone(size) || get_zone(mem->size) == 2)
+		return copy_in_new_malloc_and_free(mem, ptr, size);
+	if (mem->size >= size)
 	{
-		if (mem->size >= size)
+		if (mem->size <= size + sizeof(t_block_mem))
 		{
-			if (mem->size <= size + sizeof(t_block_mem))
-			{
-				mem->size = size;
-				return (ptr);
-			}
-			set_metadata((void *)mem + sizeof(t_block_mem) + size, mem->size - (size + sizeof(t_block_mem)), mem, mem->next);
-			set_metadata_next_block((void*)mem, (void *)mem + (sizeof(t_block_mem) + size));
-			mem->size = size;
-			mem->real_size = size;
-			free((void *)mem + (sizeof(t_block_mem) * 2) + size);
-			return ((void*)mem->next + sizeof(t_block_mem));
+			return copy_in_new_malloc_and_free(mem, ptr, size);
 		}
-		if (mem->next == NULL && size <= get_size_left_on_page(mem))
-		{
-			mem->size = size;
-			mem->real_size = size;
-			return (ptr);
-		}
-		new_alloc = (t_block_mem*)malloc(size);
-		ft_memcpy(new_alloc, (void*)mem, mem->size);
-		free(ptr);
-		return ((void*)new_alloc);
+		set_metadata((void *)mem + sizeof(t_block_mem) + size, mem->size - (size + sizeof(t_block_mem)), mem, mem->next);
+		set_metadata_next_block((void*)mem, (void *)mem + (sizeof(t_block_mem) + size));
+		mem->size = size;
+		free((void *)mem + (sizeof(t_block_mem) * 2) + size);
+		return ((void*)mem->next + sizeof(t_block_mem));
 	}
-	return (ptr);
+	if (mem->next == NULL && size <= get_size_left_on_page(mem))
+	{
+		mem->size = size;
+		return (ptr);
+	}
+	return copy_in_new_malloc_and_free(mem, ptr, size);
 }
