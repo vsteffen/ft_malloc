@@ -18,8 +18,8 @@
 # include <stdlib.h>
 # include <unistd.h>
 
-# define TINY 32
-# define SMALL 64
+# define TINY 254
+# define SMALL 1024
 # define DEBUG 1
 
 typedef struct			s_block_mem {

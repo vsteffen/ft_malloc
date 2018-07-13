@@ -51,7 +51,6 @@ void	free(void *ptr) {
 	tmp = mem->prev;
 	if (tmp)
 	{
-		print_debug_size_t((size_t)zone, "zone");
 		if (zone < 2)
 		{
 			if (tmp->used == 0 && mem->new_page == 0)

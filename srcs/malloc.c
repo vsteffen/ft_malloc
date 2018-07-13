@@ -7,9 +7,15 @@ int8_t			get_zone(size_t size_requested) {
 	// print_size(TINY * (size_t)getpagesize());
 	// ft_putstr("\n");
 
-	if ((size_requested * 100) + sizeof(t_block_mem) <= TINY * (size_t)getpagesize())
+	if (size_requested <= TINY)
 		return 0;
-	if ((size_requested * 100) + sizeof(t_block_mem) <= SMALL * (size_t)getpagesize())
+	if (size_requested <= SMALL)
+		return 1;
+	return 2;
+
+	if ((size_requested * 100) + 100 * sizeof(t_block_mem) <= TINY * (size_t)getpagesize())
+		return 0;
+	if ((size_requested * 100) + 100 * sizeof(t_block_mem) <= SMALL * (size_t)getpagesize())
 		return 1;
 	return 2;
 }
@@ -41,10 +47,11 @@ void			set_metadata_prev_block(t_block_mem *mem, t_block_mem *prev_block) {
 void			*request_memory(size_t size_requested, int8_t zone) {
 	size_t		size_malloc;
 
+	print_debug_size_t((size_t)sizeof(t_block_mem), "struct");
 	if (zone == 0)
-		size_malloc = getpagesize() * TINY;
+		size_malloc = getpagesize() * 7;
 	else if (zone == 1)
-		size_malloc = getpagesize() * SMALL;
+		size_malloc = getpagesize() * 26;
 	else
 		size_malloc = size_requested + sizeof(t_block_mem);
 	return mmap(0, size_malloc, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);

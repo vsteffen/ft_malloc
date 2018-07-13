@@ -182,5 +182,13 @@ int			main(int ac, char **av)
 	ptr = malloc(16); // -->0x100380824
 	memset(ptr, 75, 16);
 	show_alloc_mem();
+
+	ft_putstr("\nSearching size optimisation:\n");
+	for (int i = 1; i < 30; i++) {
+		ft_putchar('\n');
+		print_debug_size_t((size_t)i, "i");
+		print_debug_size_t((i * getpagesize() - 3200) / 100	, "space left");
+	}
+
 	return (0);
 }
