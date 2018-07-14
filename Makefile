@@ -39,10 +39,12 @@ LPATH	=	$(LIBFT)/libft.a
 HPATH 	=	-I $(ROOT)/includes -I $(LIBFT)/includes
 
 SRC =	malloc.c \
-		realloc.c \
-		free.c \
-		show_alloc_mem.c \
-		globals.c
+	realloc.c \
+	calloc.c \
+	free.c \
+	valloc.c \
+	show_alloc_mem.c \
+	globals.c
 
 .PHONY: all clean fclean re
 
@@ -67,6 +69,8 @@ $(NAME): $(OPATH) $(OBJ)
 	@ln -s $@ libft_malloc.so
 	@echo "Generate tests"
 	@$(CC) -o "test1" tests/ft_malloc.c libft_malloc.so
+	@$(CC) -o cor0 ./tests/cor0.c libft_malloc.so
+	@$(CC) -o cor1 ./tests/cor1.c libft_malloc.so
 	@echo "\033[32m ╔════════════════╗"
 	@echo " ║  All is done ! ║"
 	@echo " ╚════════════════╝\033[0m"

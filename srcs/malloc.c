@@ -47,7 +47,6 @@ void			set_metadata_prev_block(t_block_mem *mem, t_block_mem *prev_block) {
 void			*request_memory(size_t size_requested, int8_t zone) {
 	size_t		size_malloc;
 
-	print_debug_size_t((size_t)sizeof(t_block_mem), "struct");
 	if (zone == 0)
 		size_malloc = getpagesize() * 7;
 	else if (zone == 1)
@@ -106,9 +105,9 @@ void			*find_next_mem_tn_sm(t_block_mem **mem, size_t size_requested, int8_t zon
 	size_t			size_hole;
 
 	if (zone == 0)
-		size_page = getpagesize() * TINY;
+		size_page = getpagesize() * 7;
 	else
-		size_page = getpagesize() * SMALL;
+		size_page = getpagesize() * 23;
 	before = mem;
 	size_used_total = (*mem)->size + sizeof(t_block_mem);
 	mem = &(*mem)->next;
