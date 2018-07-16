@@ -68,9 +68,13 @@ $(NAME): $(OPATH) $(OBJ)
 	$(RM) -f libft_malloc.so
 	@ln -s $@ libft_malloc.so
 	@echo "Generate tests"
-	@$(CC) -o "test1" tests/ft_malloc.c libft_malloc.so
-	@$(CC) -o cor0 ./tests/cor0.c libft_malloc.so
-	@$(CC) -o cor1 ./tests/cor1.c libft_malloc.so
+	@$(CC) -o "ft_malloc" tests/ft_malloc.c libft_malloc.so
+	@$(CC) -o test0 ./tests/test0.c libft_malloc.so
+	@$(CC) -o test1 ./tests/test1.c libft_malloc.so
+	@$(CC) -o test2 ./tests/test2.c libft_malloc.so
+	@$(CC) -o test3.1 ./tests/test3.1.c libft_malloc.so
+	@$(CC) -o test3.2 ./tests/test3.2.c libft_malloc.so
+	@$(CC) -o test4 ./tests/test4.c libft_malloc.so
 	@echo "\033[32m ╔════════════════╗"
 	@echo " ║  All is done ! ║"
 	@echo " ╚════════════════╝\033[0m"
@@ -98,7 +102,13 @@ fclean: clean
 	$(RM) -f libft_malloc.so
 	@echo "\033[32m$(NAME) deleted.\033[0m\n"
 	@echo "Deleting test files."
+	$(RM) -f ft_malloc
+	$(RM) -f test0
 	$(RM) -f test1
+	$(RM) -f test2
+	$(RM) -f test3.1
+	$(RM) -f test3.2
+	$(RM) -f test4
 	@echo "\033[32mTest files deleted.\033[0m\n"
 
 libft:

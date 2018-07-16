@@ -48,11 +48,12 @@ void			*request_memory(size_t size_requested, int8_t zone) {
 	size_t		size_malloc;
 
 	if (zone == 0)
-		size_malloc = getpagesize() * 7;
+		size_malloc = (((TINY * 100) + (sizeof(t_block_mem) * 100)) / getpagesize() + 1) * getpagesize();
 	else if (zone == 1)
-		size_malloc = getpagesize() * 26;
+		size_malloc = (((SMALL * 100) + (sizeof(t_block_mem) * 100)) / getpagesize() + 1) * getpagesize();
 	else
-		size_malloc = size_requested + sizeof(t_block_mem);
+		size_malloc = ((size_requested + sizeof(t_block_mem)) / getpagesize() + 1) * getpagesize();
+	print_debug_size_t((size_t)size_malloc / getpagesize(), "size getpagesize");
 	return mmap(0, size_malloc, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
 }
 
@@ -62,8 +63,8 @@ void			*create_new_page(size_t size_requested, int8_t zone, t_block_mem *prev)
 	t_block_mem	*mem;
 
 	new_page = request_memory(size_requested, zone);
-	if (new_page == (void *) -1)
-		return NULL;
+	if (new_page == MAP_FAILED)
+		return (NULL);
 	set_metadata((t_block_mem*)new_page, size_requested, prev, NULL);
 	mem = (t_block_mem*)new_page;
 	mem->new_page = 1;

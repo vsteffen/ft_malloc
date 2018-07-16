@@ -20,7 +20,7 @@
 
 # define TINY 254
 # define SMALL 1024
-# define DEBUG 0
+# define DEBUG 1
 
 typedef struct			s_block_mem {
 	size_t				size;

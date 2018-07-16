@@ -1,6 +1,8 @@
-int	main()
+#include <stdlib.h>
+
+int		main()
 {
-	int	i;
+	int		i;
 	char	*addr;
 
 	i = 0;
@@ -8,6 +10,7 @@ int	main()
 	{
 		addr = (char*)malloc(1024);
 		addr[0] = 42;
+		free(addr);
 		i++;
 	}
 	return (0);

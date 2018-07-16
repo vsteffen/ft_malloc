@@ -1,8 +1,6 @@
-#include <stdlib.h>
-
-int	main()
+int		main()
 {
-	int	i;
+	int		i;
 	char	*addr;
 
 	i = 0;

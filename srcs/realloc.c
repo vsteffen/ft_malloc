@@ -44,7 +44,7 @@ void	*copy_in_new_malloc_and_free(t_block_mem *mem, void *ptr, size_t size)
 	t_block_mem		*new_alloc;
 
 	new_alloc = (t_block_mem*)malloc(size);
-	ft_memcpy(new_alloc, (void*)mem, mem->size);
+	ft_memcpy(new_alloc, (void*)mem + sizeof(t_block_mem), mem->size);
 	free(ptr);
 	return ((void*)new_alloc);
 }
@@ -57,7 +57,7 @@ void	*realloc(void *ptr, size_t size) {
 	if (!ptr)
 		return (malloc(size));
 	if (isset_addr(ptr) == 0)
-		return (malloc(size));
+		return (NULL);
 	if (size == 0)
 		return (malloc(0));
 	mem = (t_block_mem *)(ptr - sizeof(t_block_mem));
