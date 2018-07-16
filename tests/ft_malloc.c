@@ -395,7 +395,7 @@ int			main(int ac, char **av)
 	free(ptr4);
 	ptr = malloc(16); // --> 0x100383336
 	ptr = malloc(16); // --> 0x100383366
-	show_alloc_mem();
+	// show_alloc_mem();
 
 	// ft_putstr("\nSearching size optimisation:\n");
 	// for (int i = 1; i < 30; i++) {

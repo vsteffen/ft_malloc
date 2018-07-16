@@ -120,7 +120,9 @@ void	print_mem(t_block_mem *mem, char *zone)
 }
 
 void	show_alloc_mem() {
+	pthread_mutex_lock(&g_mutex);
 	print_mem(g_mem[0], "TINY");
 	print_mem(g_mem[1], "SMALL");
 	print_mem(g_mem[2], "LARGE");
+	pthread_mutex_unlock(&g_mutex);
 }

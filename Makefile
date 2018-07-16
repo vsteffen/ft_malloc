@@ -35,7 +35,7 @@ LIBFT 	=	$(LIBSRCS)/libft
 ROOT  	=	$(shell /bin/pwd)
 OPATH 	=	$(ROOT)/objs
 CPATH 	=	$(ROOT)/srcs
-LPATH	=	$(LIBFT)/libft.a
+LPATH	=	$(LIBFT)/libft.a -lpthread
 HPATH 	=	-I $(ROOT)/includes -I $(LIBFT)/includes
 
 SRC =	malloc.c \
@@ -68,13 +68,13 @@ $(NAME): $(OPATH) $(OBJ)
 	$(RM) -f libft_malloc.so
 	@ln -s $@ libft_malloc.so
 	@echo "Generate tests"
-	@$(CC) -o "ft_malloc" tests/ft_malloc.c libft_malloc.so
-	@$(CC) -o test0 ./tests/test0.c libft_malloc.so
-	@$(CC) -o test1 ./tests/test1.c libft_malloc.so
-	@$(CC) -o test2 ./tests/test2.c libft_malloc.so
-	@$(CC) -o test3.1 ./tests/test3.1.c libft_malloc.so
-	@$(CC) -o test3.2 ./tests/test3.2.c libft_malloc.so
-	@$(CC) -o test4 ./tests/test4.c libft_malloc.so
+	@$(CC) -o "ft_malloc" tests/ft_malloc.c
+	@$(CC) -o test0 ./tests/test0.c
+	@$(CC) -o test1 ./tests/test1.c
+	@$(CC) -o test2 ./tests/test2.c
+	@$(CC) -o test3.1 ./tests/test3.1.c
+	@$(CC) -o test3.2 ./tests/test3.2.c
+	@$(CC) -o test4 ./tests/test4.c
 	@echo "\033[32m ╔════════════════╗"
 	@echo " ║  All is done ! ║"
 	@echo " ╚════════════════╝\033[0m"

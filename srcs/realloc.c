@@ -44,6 +44,7 @@ void	*copy_in_new_malloc_and_free(t_block_mem *mem, void *ptr, size_t size)
 	t_block_mem		*new_alloc;
 
 	new_alloc = (t_block_mem*)malloc(size);
+	// ft_memcpy(new_alloc, (void*)mem, mem->size);
 	ft_memcpy(new_alloc, (void*)mem + sizeof(t_block_mem), mem->size);
 	free(ptr);
 	return ((void*)new_alloc);
@@ -52,6 +53,7 @@ void	*copy_in_new_malloc_and_free(t_block_mem *mem, void *ptr, size_t size)
 void	*realloc(void *ptr, size_t size) {
 	t_block_mem		*mem;
 
+	// pthread_mutex_lock(&g_mutex);
 	print_debug_addr(ptr, "Realloc address");
 	print_debug_size_t(size, "Realloc size");
 	if (!ptr)
@@ -59,7 +61,10 @@ void	*realloc(void *ptr, size_t size) {
 	if (isset_addr(ptr) == 0)
 		return (NULL);
 	if (size == 0)
+	{
+		free(ptr);
 		return (malloc(0));
+	}
 	mem = (t_block_mem *)(ptr - sizeof(t_block_mem));
 	// don't forget realloc in new zone
 	if (get_zone(mem->size) != get_zone(size) || get_zone(mem->size) == 2)

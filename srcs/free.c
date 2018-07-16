@@ -43,6 +43,8 @@ void	free(void *ptr) {
 	uint8_t			count = 0;
 	int8_t			zone;
 
+	// pthread_mutex_lock(&g_mutex);
+	return ;
 	print_debug_addr(ptr, "Free address");
 	if (!ptr || isset_addr(ptr) == 0)
 		return ;

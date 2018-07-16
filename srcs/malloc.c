@@ -12,12 +12,6 @@ int8_t			get_zone(size_t size_requested) {
 	if (size_requested <= SMALL)
 		return 1;
 	return 2;
-
-	if ((size_requested * 100) + 100 * sizeof(t_block_mem) <= TINY * (size_t)getpagesize())
-		return 0;
-	if ((size_requested * 100) + 100 * sizeof(t_block_mem) <= SMALL * (size_t)getpagesize())
-		return 1;
-	return 2;
 }
 
 
@@ -53,7 +47,6 @@ void			*request_memory(size_t size_requested, int8_t zone) {
 		size_malloc = (((SMALL * 100) + (sizeof(t_block_mem) * 100)) / getpagesize() + 1) * getpagesize();
 	else
 		size_malloc = ((size_requested + sizeof(t_block_mem)) / getpagesize() + 1) * getpagesize();
-	print_debug_size_t((size_t)size_malloc / getpagesize(), "size getpagesize");
 	return mmap(0, size_malloc, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
 }
 
@@ -106,9 +99,9 @@ void			*find_next_mem_tn_sm(t_block_mem **mem, size_t size_requested, int8_t zon
 	size_t			size_hole;
 
 	if (zone == 0)
-		size_page = getpagesize() * 7;
+		size_page = (((TINY * 100) + (sizeof(t_block_mem) * 100)) / getpagesize() + 1) * getpagesize();
 	else
-		size_page = getpagesize() * 23;
+		size_page = (((SMALL * 100) + (sizeof(t_block_mem) * 100)) / getpagesize() + 1) * getpagesize();
 	before = mem;
 	size_used_total = (*mem)->size + sizeof(t_block_mem);
 	mem = &(*mem)->next;
@@ -171,11 +164,18 @@ void	print_debug_addr(void *debug, char *name) {
 	}
 }
 
+void			*unlock_mutex_with_ptr(void *ptr)
+{
+	pthread_mutex_unlock(&g_mutex);
+	return (ptr);
+}
+
 void			*malloc(size_t size) {
 	void			*alloc_requested;
 	t_block_mem		**mem;
 	int8_t			zone;
 
+	pthread_mutex_lock(&g_mutex);
 	print_debug_size_t(size, "Malloc size");
 	zone = get_zone(size);
 	mem = &g_mem[zone];
@@ -192,7 +192,7 @@ void			*malloc(size_t size) {
 			alloc_requested = find_next_mem_large(mem, size);
 	}
 	if (alloc_requested == NULL)
-		return NULL;
+		return (unlock_mutex_with_ptr(NULL));
 	print_debug_addr(alloc_requested + sizeof(t_block_mem), "Malloc ptr return");
-	return alloc_requested + sizeof(t_block_mem);
+	return (unlock_mutex_with_ptr(alloc_requested + sizeof(t_block_mem)));
 }

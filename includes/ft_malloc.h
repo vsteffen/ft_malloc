@@ -17,10 +17,11 @@
 # include <sys/mman.h>
 # include <stdlib.h>
 # include <unistd.h>
+# include <pthread.h>
 
 # define TINY 254
 # define SMALL 1024
-# define DEBUG 1
+# define DEBUG 0
 
 typedef struct			s_block_mem {
 	size_t				size;
@@ -31,6 +32,8 @@ typedef struct			s_block_mem {
 }						t_block_mem;
 
 extern t_block_mem		*g_mem[3];
+
+extern pthread_mutex_t	g_mutex;
 
 void			free(void *ptr);
 void			*malloc(size_t size);
@@ -44,6 +47,8 @@ void			set_metadata_next_block(t_block_mem *mem, t_block_mem *next_block);
 void			set_metadata_prev_block(t_block_mem *mem, t_block_mem *prev_block);
 
 int8_t			isset_addr(void *ptr);
+void			*unlock_mutex_with_ptr(void *ptr);
+void			unlock_mutex_with_void();
 
 void			print_size(size_t n);
 void			print_addr(void *ptr);
