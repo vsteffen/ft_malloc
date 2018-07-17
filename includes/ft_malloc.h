@@ -47,8 +47,9 @@ void			set_metadata_next_block(t_block_mem *mem, t_block_mem *next_block);
 void			set_metadata_prev_block(t_block_mem *mem, t_block_mem *prev_block);
 
 int8_t			isset_addr(void *ptr);
-void			*unlock_mutex_with_ptr(void *ptr);
-void			unlock_mutex_with_void();
+void			*mutex_unlock_with_ptr(void *ptr);
+void			start_free(void *ptr);
+void			*start_malloc(size_t size);
 
 void			print_size(size_t n);
 void			print_addr(void *ptr);

@@ -1,5 +1,10 @@
 #include "ft_malloc.h"
 
+void	*mutex_unlock_with_ptr(void *ptr) {
+	pthread_mutex_unlock(&g_mutex);
+	return (ptr);
+}
+
 int8_t	isset_addr(void *ptr) {
 	t_block_mem		*mem;
 	int8_t			i;
@@ -43,48 +48,49 @@ void	*copy_in_new_malloc_and_free(t_block_mem *mem, void *ptr, size_t size)
 {
 	t_block_mem		*new_alloc;
 
-	new_alloc = (t_block_mem*)malloc(size);
+	new_alloc = (t_block_mem*)start_malloc(size);
 	// ft_memcpy(new_alloc, (void*)mem, mem->size);
 	ft_memcpy(new_alloc, (void*)mem + sizeof(t_block_mem), mem->size);
-	free(ptr);
+	start_free(ptr);
 	return ((void*)new_alloc);
 }
 
 void	*realloc(void *ptr, size_t size) {
 	t_block_mem		*mem;
 
-	// pthread_mutex_lock(&g_mutex);
+	write(1, "REALLOC CALLED\n", 15);
+	pthread_mutex_lock(&g_mutex);
 	print_debug_addr(ptr, "Realloc address");
 	print_debug_size_t(size, "Realloc size");
 	if (!ptr)
-		return (malloc(size));
+		return (mutex_unlock_with_ptr(start_malloc(size)));
 	if (isset_addr(ptr) == 0)
-		return (NULL);
+		return (mutex_unlock_with_ptr(NULL));
 	if (size == 0)
 	{
-		free(ptr);
-		return (malloc(0));
+		start_free(ptr);
+		return (mutex_unlock_with_ptr(start_malloc(0)));
 	}
 	mem = (t_block_mem *)(ptr - sizeof(t_block_mem));
 	// don't forget realloc in new zone
 	if (get_zone(mem->size) != get_zone(size) || get_zone(mem->size) == 2)
-		return copy_in_new_malloc_and_free(mem, ptr, size);
+		return (mutex_unlock_with_ptr(copy_in_new_malloc_and_free(mem, ptr, size)));
 	if (mem->size >= size)
 	{
 		if (mem->size <= size + sizeof(t_block_mem))
 		{
-			return copy_in_new_malloc_and_free(mem, ptr, size);
+			return (mutex_unlock_with_ptr(copy_in_new_malloc_and_free(mem, ptr, size)));
 		}
-		set_metadata((void *)mem + sizeof(t_block_mem) + size, mem->size - (size + sizeof(t_block_mem)), mem, mem->next);
-		set_metadata_next_block((void*)mem, (void *)mem + (sizeof(t_block_mem) + size));
+		set_metadata((t_block_mem*)(((void *)mem) + sizeof(t_block_mem) + size), mem->size - (size + sizeof(t_block_mem)), mem, mem->next);
+		set_metadata_next_block(mem, (t_block_mem*)(((void *)mem) + (sizeof(t_block_mem) + size)));
 		mem->size = size;
-		free((void *)mem + (sizeof(t_block_mem) * 2) + size);
-		return ((void*)mem->next + sizeof(t_block_mem));
+		start_free((void *)mem + (sizeof(t_block_mem) * 2) + size);
+		return (mutex_unlock_with_ptr((void*)mem->next + sizeof(t_block_mem)));
 	}
 	if (mem->next == NULL && size <= get_size_left_on_page(mem))
 	{
 		mem->size = size;
-		return (ptr);
+		return (mutex_unlock_with_ptr(ptr));
 	}
-	return copy_in_new_malloc_and_free(mem, ptr, size);
+	return (mutex_unlock_with_ptr(copy_in_new_malloc_and_free(mem, ptr, size)));
 }

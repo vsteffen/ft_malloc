@@ -68,7 +68,7 @@ $(NAME): $(OPATH) $(OBJ)
 	$(RM) -f libft_malloc.so
 	@ln -s $@ libft_malloc.so
 	@echo "Generate tests"
-	@$(CC) -o "ft_malloc" tests/ft_malloc.c
+	@$(CC) -o "ft_malloc" tests/ft_malloc.c libft_malloc.so
 	@$(CC) -o test0 ./tests/test0.c
 	@$(CC) -o test1 ./tests/test1.c
 	@$(CC) -o test2 ./tests/test2.c

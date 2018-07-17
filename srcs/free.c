@@ -37,19 +37,28 @@ void	remove_empty_page(t_block_mem *page, t_block_mem **global_ptr, void *ptr)
 	}
 }
 
-void	free(void *ptr) {
+void	start_free(void *ptr)
+{
 	t_block_mem		*mem;
 	t_block_mem		*tmp;
 	uint8_t			count = 0;
 	int8_t			zone;
 
-	// pthread_mutex_lock(&g_mutex);
 	return ;
 	print_debug_addr(ptr, "Free address");
 	if (!ptr || isset_addr(ptr) == 0)
 		return ;
 	mem = (t_block_mem *)(ptr - sizeof(t_block_mem));
+	print_debug_addr((void*)mem, "Free address mem");
 	zone = get_zone(mem->size);
+	// return ;
+    //
+	// if (zone < 2)
+	// {
+	// 	// mem->used = 0;
+	// }
+	// return ;
+
 	tmp = mem->prev;
 	if (tmp)
 	{
@@ -79,7 +88,7 @@ void	free(void *ptr) {
 		}
 		else
 		{
-			if (&mem == &g_mem[2])
+			if (&mem == &(g_mem[2]))
 				g_mem[2] = tmp;
 			tmp->prev = mem->prev;
 		}
@@ -88,12 +97,18 @@ void	free(void *ptr) {
 	{
 		mem->used = 0;
 		count++;
-		if (count == 255)
-			remove_empty_page((t_block_mem*)ptr, &g_mem[get_zone(mem->size)], ptr);
+		// if (count == 255)
+		// 	remove_empty_page((t_block_mem*)ptr, &g_mem[get_zone(mem->size)], ptr);
 		return ;
 	}
 	if (munmap(ptr, 0) == 0)
 		(void)ptr; // success
 	else
 		(void)ptr; // failed
+}
+
+void	free(void *ptr) {
+	pthread_mutex_lock(&g_mutex);
+	start_free(ptr);
+	pthread_mutex_unlock(&g_mutex);
 }

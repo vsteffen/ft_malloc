@@ -42,6 +42,10 @@ int			main(int ac, char **av)
 	char	*ptr15;
 	char	*ptr16;
 
+	// void *ptr42 = malloc(16);
+	// free(ptr42);
+	// return (0);
+
 	// ptr = malloc(1024);
 	// // free(0x7FC7CE400090);
 	// // free(0x7FC7CE400080);
