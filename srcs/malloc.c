@@ -64,36 +64,22 @@ void			*create_new_page(size_t size_requested, int8_t zone, t_block_mem *prev)
 	return (new_page);
 }
 
-void			*find_next_mem_large(t_block_mem **mem, size_t size_requested) {
+void			*find_next_mem_large(t_block_mem *mem, size_t size_requested) {
 	void		*ptr;
-	t_block_mem	**before;
+	t_block_mem	*before;
 
-	while (*mem != NULL)
+	while (mem != NULL)
 	{
 		before = mem;
-		mem = &(*mem)->next;
+		mem = mem->next;
 	}
-	ptr = create_new_page(size_requested, 2, *before);
-	set_metadata_next_block(*before, (t_block_mem *)ptr);
+	ptr = create_new_page(size_requested, 2, before);
+	set_metadata_next_block(before, (t_block_mem *)ptr);
 	return (ptr);
 }
 
-size_t		search_size_hole(t_block_mem *mem) {
-	size_t	size_hole;
-
-	size_hole = 0;
-	while (mem && mem->used == 0)
-	{
-		size_hole += sizeof(t_block_mem) + mem->size;
-		if ((void*)mem + sizeof(t_block_mem) + mem->size != (void*)mem->next) // next malloc is in new page
-			break ;
-		mem = mem->next;
-	}
-	return size_hole;
-}
-
-void			*find_next_mem_tn_sm(t_block_mem **mem, size_t size_requested, int8_t zone) {
-	t_block_mem		**before;
+void			*find_next_mem_tn_sm(t_block_mem *mem, size_t size_requested, int8_t zone) {
+	t_block_mem		*before;
 	t_block_mem		*new_space_free;
 	size_t			size_page;
 	size_t			size_used_total;
@@ -103,34 +89,34 @@ void			*find_next_mem_tn_sm(t_block_mem **mem, size_t size_requested, int8_t zon
 	else
 		size_page = (((SMALL * 100) + (sizeof(t_block_mem) * 100)) / getpagesize() + 1) * getpagesize();
 	before = mem;
-	size_used_total = 0;
-	mem = &(*mem)->next;
-	while (*mem != NULL)
+	size_used_total = mem->size + sizeof(t_block_mem);
+	mem = mem->next;
+	while (mem != NULL)
 	{
-		if ((*mem)->new_page == 1)
+		if (mem->new_page == 1)
 		{
 			size_used_total = 0;
 		}
-		if ((*mem)->used == 0) {
+		if (mem->used == 0) {
 			// ft_putstr("Trying to refill hole left by free for new malloc\n");
 			write(1, "REUSE OF HOLE\n", 14);
-			if ((*mem)->size >= size_requested)
+			if (mem->size >= size_requested)
 			{
-				(*mem)->used = 1;
-				if ((*mem)->size >= size_requested + sizeof(t_block_mem)) // if we have space enough to create free page after the part reuse of this one
+				mem->used = 1;
+				if (mem->size >= size_requested + sizeof(t_block_mem)) // if we have space enough to create free page after the part reuse of this one
 				{
-					new_space_free = (void *)(*mem) + sizeof(t_block_mem) + size_requested;
-					set_metadata(new_space_free, (*mem)->size - (size_requested + sizeof(t_block_mem)), (void *)(*mem), (*mem)->next);
-					set_metadata_next_block(*mem, new_space_free);
-					(*mem)->size = size_requested;
+					new_space_free = (void *)mem + sizeof(t_block_mem) + size_requested;
+					set_metadata(new_space_free, mem->size - (size_requested + sizeof(t_block_mem)), (void *)mem, mem->next);
+					set_metadata_next_block(mem, new_space_free);
+					mem->size = size_requested;
 					new_space_free->used = 0;
 				}
-				return ((void*)(*mem));
+				return ((void*)mem);
 			}
 		}
-		size_used_total += (*mem)->size + sizeof(t_block_mem);
+		size_used_total += mem->size + sizeof(t_block_mem);
 		before = mem;
-		mem = &(*mem)->next;
+		mem = mem->next;
 	}
 	print_debug_size_t(size_page, "SIZE PAGE");
 	print_debug_size_t(size_used_total, "SIZE TOTAL");
@@ -138,14 +124,14 @@ void			*find_next_mem_tn_sm(t_block_mem **mem, size_t size_requested, int8_t zon
 	if (size_used_total + size_requested + sizeof(t_block_mem) > size_page)
 	{
 		// ft_putstr("Creation of new page and return ptr on free space\n");
-		void *ptr = create_new_page(size_requested, zone, *before);
-		set_metadata_next_block(*before, (t_block_mem *)ptr);
+		void *ptr = create_new_page(size_requested, zone, before);
+		set_metadata_next_block(before, (t_block_mem *)ptr);
 		return (ptr);
 	}
 	// print_debug_size_t(size_used_total + sizeof(t_block_mem) + size_requested, "size_used_total");
-	set_metadata((t_block_mem*)(((void *)(*before)) + (sizeof(t_block_mem) + (*before)->size)), size_requested, *before, NULL);
-	set_metadata_next_block(*before, (t_block_mem*)(((void *)(*before)) + (sizeof(t_block_mem) + (*before)->size)));
-	return (((void *)(*before)) + (sizeof(t_block_mem) + (*before)->size));
+	set_metadata((t_block_mem*)(((void *)before) + (sizeof(t_block_mem) + before->size)), size_requested, before, NULL);
+	set_metadata_next_block(before, (t_block_mem*)(((void *)before) + (sizeof(t_block_mem) + before->size)));
+	return (((void *)before) + (sizeof(t_block_mem) + before->size));
 }
 
 void	print_debug_size_t(size_t debug, char *name) {
@@ -187,18 +173,14 @@ void			*start_malloc(size_t size)
 	else
 	{
 		if (zone != 2)
-			alloc_requested = find_next_mem_tn_sm(mem, size, zone);
+			alloc_requested = find_next_mem_tn_sm(*mem, size, zone);
 		else
-			alloc_requested = find_next_mem_large(mem, size);
+			alloc_requested = find_next_mem_large(*mem, size);
 	}
 	if (alloc_requested == NULL)
 		return (NULL);
 	print_debug_addr(alloc_requested + sizeof(t_block_mem), "Malloc ptr return");
-	// t_block_mem *mem_test = (t_block_mem*)alloc_requested;
-	// if (mem_test->used == 1)
-	// 	write(1, "OK\n", 3);
-	// else
-	// 	write(1, "KO\n", 3);
+
 	return (alloc_requested + sizeof(t_block_mem));
 }
 
