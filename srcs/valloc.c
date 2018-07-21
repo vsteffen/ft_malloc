@@ -8,10 +8,6 @@
 // 	void		*ptr;
 
 // 	write(1, "VALLOC CALLED\n", 14);
-// 	pthread_mutex_lock(&g_mutex);
-// 	print_debug_size_t(size, "Valloc size");
-// 	ptr = start_malloc(size, 1);
-// 	memset(ptr, 0, size);
-// 	pthread_mutex_unlock(&g_mutex);
+// 	ptr = start_malloc(size);
 // 	return ptr;
 // }

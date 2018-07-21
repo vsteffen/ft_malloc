@@ -87,11 +87,13 @@ void			*find_next_mem_tn_sm(t_block_mem *mem, size_t size_requested, int8_t zone
 	{
 		if (mem->new_page == 1)
 			size_used_total = 0;
-		if (mem->used == 0) {
+		if (mem->used == 0) 
+		{
 			// Trying to refill hole left by free for new malloc
 			if (mem->size >= size_requested)
 			{
 				mem->used = 1;
+				(void)new_space_free;
 				if (mem->size >= size_requested + sizeof(t_block_mem)) // if we have space enough to create free page after the part reuse of this one
 				{
 					new_space_free = (t_block_mem*)((void *)mem + sizeof(t_block_mem) + size_requested);
@@ -178,6 +180,8 @@ void			*start_malloc(size_t size)
 	if (alloc_requested == NULL)
 		return (NULL);
 	// print_debugf_size_t((size_t)alloc_requested % 16, "Address return multiple ? -> ");
+	// if (size == 80)
+	// 	print_debugf_addr(alloc_requested + sizeof(t_block_mem), "Addr return for malloc 80");
 	return (alloc_requested + sizeof(t_block_mem));
 }
 

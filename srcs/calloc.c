@@ -18,13 +18,14 @@ void	print_debugf_addr(void *debug, char *name) {
 
 void	*calloc(size_t count, size_t size)
 {
-	void		*ptr;
+	void			*ptr;
+	t_block_mem		*new_mem;
 
 	// write(1, "CALLOC CALLED\n", 14);
-	// print_debug_size_t(count, "Calloc count");
-	// print_debug_size_t(size, "Calloc size");
 	ptr = start_malloc(count * size);
-	memset(ptr, 0, count * size + size % (sizeof(uintptr_t) * 2));
-	// ft_bzero(ptr, count * size + size % (sizeof(uintptr_t) * 2));
-	return ptr;
+	if (!ptr)
+		return (NULL);
+	new_mem = (t_block_mem*)(ptr - sizeof(t_block_mem));
+	ft_bzero(ptr, new_mem->size);
+	return (ptr);
 }
