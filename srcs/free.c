@@ -6,10 +6,11 @@ void	start_free(void *ptr)
 	// t_block_mem		*tmp;
 	int8_t			zone;
 
-	// print_debug_addr(ptr, "Free address");
+	// print_debugf_addr(ptr, "Free address");
 	return ;
 	if (!ptr || isset_addr(ptr) == 0)
 		return ;
+	pthread_mutex_lock(&g_mutex);
 	mem = (t_block_mem *)(ptr - sizeof(t_block_mem));
 	zone = get_zone(mem->size);
 	// tmp = mem->prev;
@@ -49,16 +50,17 @@ void	start_free(void *ptr)
 	if (zone < 2)
 	{
 		mem->used = 0;
+		pthread_mutex_unlock(&g_mutex);
 		return ;
 	}
 	if (munmap(ptr, 0) == 0)
 		(void)ptr; // success
 	else
 		(void)ptr; // failed
+	pthread_mutex_unlock(&g_mutex);
 }
 
 void	free(void *ptr) {
-	pthread_mutex_lock(&g_mutex);
 	// ft_putstr("FREE CALLED\n");
 	start_free(ptr);
 	// ft_putstr("FREE END\n");
