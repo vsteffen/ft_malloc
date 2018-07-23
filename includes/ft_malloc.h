@@ -19,8 +19,8 @@
 # include <unistd.h>
 # include <pthread.h>
 
-# define TINY 256
-# define SMALL 1040
+# define TINY 128
+# define SMALL 1024
 # define DEBUG 0
 
 typedef struct			s_block_mem {

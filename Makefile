@@ -75,6 +75,7 @@ $(NAME): $(OPATH) $(OBJ)
 	@$(CC) -o test3.1 ./tests/test3.1.c
 	@$(CC) -o test3.2 ./tests/test3.2.c
 	@$(CC) -o test4 ./tests/test4.c
+	@$(CC) -o test5 ./tests/test5.c libft_malloc.so
 	@echo "\033[32m ╔════════════════╗"
 	@echo " ║  All is done ! ║"
 	@echo " ╚════════════════╝\033[0m"
@@ -109,6 +110,7 @@ fclean: clean
 	$(RM) -f test3.1
 	$(RM) -f test3.2
 	$(RM) -f test4
+	$(RM) -f test5
 	@echo "\033[32mTest files deleted.\033[0m\n"
 
 libft:
