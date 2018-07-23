@@ -59,19 +59,12 @@ void	*start_realloc(void *ptr, size_t size)
 		{
 			return (ptr);
 		}
-		// set_metadata((t_block_mem*)((void *)mem + sizeof(t_block_mem) + size), mem->size - (size + sizeof(t_block_mem)), mem->next);
 		set_metadata((t_block_mem*)(ptr + size), mem->size - (size + sizeof(t_block_mem)), mem->next);
-		// set_metadata_next_block(mem, (t_block_mem*)(((void *)mem) + (sizeof(t_block_mem) + size)));
 		set_metadata_next_block(mem, (t_block_mem*)(ptr + size));
 		mem->size = size;
-		// start_free((void *)mem + (sizeof(t_block_mem) * 2) + size);
 		start_free(ptr + size + sizeof(t_block_mem));
-		// return ((void*)mem->next + sizeof(t_block_mem));
 		return (ptr);
 	}
-
-	// if (get_zone(mem->size) != get_zone(size) || get_zone(mem->size) == 2) // Can't do this because emacs sucks... a lot
-	// 	return (copy_in_new_malloc_and_free(ptr, size));
 	return (copy_in_new_malloc_and_free(ptr, size));
 }
 

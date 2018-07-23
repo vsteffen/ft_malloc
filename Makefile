@@ -44,7 +44,10 @@ SRC =	malloc.c \
 	free.c \
 	show_alloc_mem.c \
 	globals.c \
-	functions.c
+	functions.c \
+	memory_manager.c \
+	block_getters_and_setters.c \
+	print_debug.c
 
 .PHONY: all clean fclean re
 
