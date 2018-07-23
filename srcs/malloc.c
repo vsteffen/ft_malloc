@@ -87,13 +87,12 @@ void			*find_next_mem_tn_sm(t_block_mem *mem, size_t size_requested, int8_t zone
 	{
 		if (mem->new_page == 1)
 			size_used_total = 0;
-		if (mem->used == 0) 
+		if (mem->used == 0)
 		{
 			// Trying to refill hole left by free for new malloc
 			if (mem->size >= size_requested)
 			{
 				mem->used = 1;
-				(void)new_space_free;
 				if (mem->size >= size_requested + sizeof(t_block_mem)) // if we have space enough to create free page after the part reuse of this one
 				{
 					new_space_free = (t_block_mem*)((void *)mem + sizeof(t_block_mem) + size_requested);
@@ -157,7 +156,6 @@ void			*start_malloc(size_t size)
 	int8_t			zone;
 
  	// https://stackoverflow.com/questions/227897/how-to-allocate-aligned-memory-only-using-the-standard-library
-	pthread_mutex_lock(&g_mutex);
 	if (size % (sizeof(uintptr_t) * 2) > 0)
 		size = (size / (sizeof(uintptr_t) * 2) + 1) * (sizeof(uintptr_t) * 2);
 	// print_debugf_size_t(size, "Malloc size");
@@ -176,20 +174,11 @@ void			*start_malloc(size_t size)
 			alloc_requested = find_next_mem_large(*mem, size);
 	}
 	print_debug_addr(alloc_requested + sizeof(t_block_mem), "Malloc ptr return");
-	pthread_mutex_unlock(&g_mutex);
 	if (alloc_requested == NULL)
 		return (NULL);
-	// print_debugf_size_t((size_t)alloc_requested % 16, "Address return multiple ? -> ");
-	// if (size == 80)
-	// 	print_debugf_addr(alloc_requested + sizeof(t_block_mem), "Addr return for malloc 80");
 	return (alloc_requested + sizeof(t_block_mem));
 }
 
 void			*malloc(size_t size) {
-	void		*ptr;
-
-	// write(1, "MALLOC CALLED\n", 14);
-	ptr = start_malloc(size);
-	// write(1, "MALLOC END\n", 11);
-	return (ptr);
+	return (memory_management_mutex(NULL, size, 0, 2));
 }

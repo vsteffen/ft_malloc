@@ -18,14 +18,5 @@ void	print_debugf_addr(void *debug, char *name) {
 
 void	*calloc(size_t count, size_t size)
 {
-	void			*ptr;
-	t_block_mem		*new_mem;
-
-	// write(1, "CALLOC CALLED\n", 14);
-	ptr = start_malloc(count * size);
-	if (!ptr)
-		return (NULL);
-	new_mem = (t_block_mem*)(ptr - sizeof(t_block_mem));
-	ft_bzero(ptr, new_mem->size);
-	return (ptr);
+	return (memory_management_mutex(NULL, size, count, 0));
 }

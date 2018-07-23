@@ -49,6 +49,9 @@ int8_t			isset_addr(void *ptr);
 void			*mutex_unlock_with_ptr(void *ptr);
 void			start_free(void *ptr);
 void			*start_malloc(size_t size);
+void			*start_realloc(void *ptr, size_t size);
+void			print_mem(t_block_mem *mem, char *zone);
+void			*memory_management_mutex(void *ptr, size_t size, size_t count, int8_t action);
 
 void			print_size(size_t n);
 void			print_addr(void *ptr);

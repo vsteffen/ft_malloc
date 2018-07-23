@@ -1,10 +1,5 @@
 #include "ft_malloc.h"
 
-void	*mutex_unlock_with_ptr(void *ptr) {
-	pthread_mutex_unlock(&g_mutex);
-	return (ptr);
-}
-
 int8_t	isset_addr(void *ptr) {
 	t_block_mem		*mem;
 	int8_t			i;
@@ -48,10 +43,8 @@ void	*start_realloc(void *ptr, size_t size)
 	{
 		return (start_malloc(size));
 	}
-	pthread_mutex_lock(&g_mutex);
 	if (isset_addr(ptr) == 0)
 	{
-		pthread_mutex_unlock(&g_mutex);
 		return (NULL);
 	}
 	mem = (t_block_mem *)(ptr - sizeof(t_block_mem));
@@ -59,7 +52,6 @@ void	*start_realloc(void *ptr, size_t size)
 		size = (size / (sizeof(uintptr_t) * 2) + 1) * (sizeof(uintptr_t) * 2);
 	if (mem->size >= size)
 	{
-		pthread_mutex_unlock(&g_mutex);
 		return (ptr);
 		// if (mem->size <= size + sizeof(t_block_mem))
 		// {
@@ -76,29 +68,14 @@ void	*start_realloc(void *ptr, size_t size)
 
 	// if (get_zone(mem->size) != get_zone(size) || get_zone(mem->size) == 2) // Can't do this because emacs sucks... a lot
 	// 	return (copy_in_new_malloc_and_free(ptr, size));
-	pthread_mutex_unlock(&g_mutex);
 	return (copy_in_new_malloc_and_free(ptr, size)); // to remove
 }
 
 void	*realloc(void *ptr, size_t size) {
-	void	*realloc;
-
-	// write(1, "REALLOC CALLED\n", 15);
-	realloc = start_realloc(ptr, size);
-	// write(1, "REALLOC END\n", 12);
-	print_debug_addr(realloc, "Realloc ptr return");
-	return (realloc);
+	return (memory_management_mutex(ptr, size, 0, 3));
 }
 
 void	*reallocf(void *ptr, size_t size)
 {
-	void	*reallocf;
-
-	// write(1, "REALLOCF CALLED\n", 16);
-	reallocf = start_realloc(ptr, size);
-	if (reallocf == NULL)
-		free(ptr);
-	print_debug_addr(realloc, "Reallocf ptr return");
-	// write(1, "REALLOCF END\n", 13);
-	return (reallocf);
+	return (memory_management_mutex(ptr, size, 0, 4));
 }

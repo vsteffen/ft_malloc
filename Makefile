@@ -6,7 +6,7 @@
 #    By: vsteffen <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2016/02/06 20:52:05 by vsteffen          #+#    #+#              #
-#    Updated: 2018/03/20 18:17:27 by vsteffen         ###   ########.fr        #
+#    Updated: 2018/07/23 17:25:57 by vsteffen         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -42,9 +42,9 @@ SRC =	malloc.c \
 	realloc.c \
 	calloc.c \
 	free.c \
-	valloc.c \
 	show_alloc_mem.c \
-	globals.c
+	globals.c \
+	functions.c
 
 .PHONY: all clean fclean re
 
