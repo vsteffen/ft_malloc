@@ -31,9 +31,8 @@ typedef struct			s_block_mem {
 	struct s_block_mem	*next;
 }						t_block_mem;
 
-extern t_block_mem		*g_mem[3];
-
-extern pthread_mutex_t	g_mutex;
+extern			t_block_mem		*g_mem[3];
+extern			pthread_mutex_t	g_mutex;
 
 void			free(void *ptr);
 void			*malloc(size_t size);
@@ -45,7 +44,7 @@ int8_t			get_zone(size_t size_requested);
 void			set_metadata(t_block_mem *mem, size_t size_requested, t_block_mem *next_block);
 void			set_metadata_next_block(t_block_mem *mem, t_block_mem *next_block);
 
-int8_t			isset_addr(void *ptr);
+t_block_mem		*isset_addr_and_get_previous(void *ptr);
 void			*mutex_unlock_with_ptr(void *ptr);
 void			start_free(void *ptr);
 void			*start_malloc(size_t size);
