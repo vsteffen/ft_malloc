@@ -90,5 +90,6 @@ void			*start_malloc(size_t size)
 }
 
 void			*malloc(size_t size) {
+	add_alloc_history(2, NULL, size);
 	return (memory_management_mutex(NULL, size, 0, 2));
 }

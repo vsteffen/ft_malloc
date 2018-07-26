@@ -81,5 +81,6 @@ void			print_zone(t_block_mem *mem, char *zone, size_t *total)
 
 void			show_alloc_mem(void)
 {
+
 	memory_management_mutex(NULL, 0, 0, 5);
 }

@@ -48,10 +48,12 @@ void	*memory_management_mutex_3(void *ptr, int8_t action)
 		ft_putstr("Total : ");
 		print_size(total);
 		ft_putstr(" octets\n");
-		pthread_mutex_unlock(&g_mutex);
 	}
-	else
+	else if (action == 6)
 		show_alloc_mem_dump(ptr);
+	else
+		print_history();
+	pthread_mutex_unlock(&g_mutex);
 	return (NULL);
 }
 

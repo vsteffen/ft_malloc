@@ -67,7 +67,13 @@ int			main(int ac, char **av)
 	strcpy(str1, "abcdefghijklmnopqrstuvxyzABCDEF");
 	str1[1] = (char)11;
 	show_alloc_mem_ex(str1);
-
+	ft_putstr("+-+-+-+-+-+-+-+-+-+-+-+-+-+\n");
+	ptr = calloc(48, 1);
+	ptr = realloc(ptr, 32);
+	ptr = reallocf(ptr, 48);
+	ptr = reallocf(ptr, 64);
+	free(ptr);
+	show_alloc_history();
 	// // EMACS
 	// ptr1 = malloc(8); // --> ptr1
 	// ptr2 = malloc(16); // --> ptr2

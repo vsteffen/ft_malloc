@@ -69,10 +69,12 @@ void	*start_realloc(void *ptr, size_t size)
 }
 
 void	*realloc(void *ptr, size_t size) {
+	add_alloc_history(3, ptr, size);
 	return (memory_management_mutex(ptr, size, 0, 3));
 }
 
 void	*reallocf(void *ptr, size_t size)
 {
+	add_alloc_history(4, ptr, size);
 	return (memory_management_mutex(ptr, size, 0, 4));
 }

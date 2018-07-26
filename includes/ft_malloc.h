@@ -31,8 +31,16 @@ typedef struct			s_block_mem {
 	struct s_block_mem	*next;
 }						t_block_mem;
 
+typedef struct			s_histo_mem {
+	void				*ptr;
+	size_t				size;
+	int8_t				action;
+	struct s_histo_mem	*next;
+}						t_histo_mem;
+
 extern			t_block_mem		*g_mem[3];
 extern			pthread_mutex_t	g_mutex;
+extern			t_histo_mem		*g_history;
 
 void			free(void *ptr);
 void			*malloc(size_t size);
@@ -52,6 +60,9 @@ void			start_free(void *ptr);
 void			*start_malloc(size_t size);
 void			*start_realloc(void *ptr, size_t size);
 void			print_zone(t_block_mem *mem, char *zone, size_t *total);
+
+void			print_history(void);
+void			add_alloc_history(int8_t action, void *ptr, size_t size);
 
 void			ft_ptoa_base_malloc(uintptr_t nb, char *output);
 uint8_t			ptoa_count_numeral_base16_malloc(uintptr_t nb);
