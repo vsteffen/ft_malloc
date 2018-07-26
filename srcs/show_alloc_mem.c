@@ -19,12 +19,17 @@ void			print_addr(void *ptr)
 	uintptr_t	uip;
 
 	uip = (uintptr_t)ptr;
-	length = count_numeral_base16_malloc(uip) + 1;
-	output = (char *)mmap(0, length, \
+	length = ptoa_count_numeral_base16_malloc(uip) + 1;
+	output = (char *)mmap(0, get_size_page(length, 2), \
 		PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
+	if ((void*)output == MAP_FAILED)
+		return ;
 	ft_ptoa_base_malloc(uip, output);
 	ft_putstr(output);
-	munmap(ptr, 0);
+	if (munmap((void*)output, get_size_page(length, 2)) == 0)
+		(void)ptr; // success
+	else
+		(void)ptr; // failed
 }
 
 void			print_size(size_t n)

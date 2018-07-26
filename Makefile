@@ -43,6 +43,7 @@ SRC =	malloc.c \
 	calloc.c \
 	free.c \
 	show_alloc_mem.c \
+	show_alloc_mem_ex.c \
 	globals.c \
 	functions.c \
 	memory_manager.c \

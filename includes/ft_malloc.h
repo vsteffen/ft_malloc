@@ -54,7 +54,11 @@ void			*start_realloc(void *ptr, size_t size);
 void			print_zone(t_block_mem *mem, char *zone, size_t *total);
 
 void			ft_ptoa_base_malloc(uintptr_t nb, char *output);
-uint8_t			count_numeral_base16_malloc(uintptr_t nb);
+uint8_t			ptoa_count_numeral_base16_malloc(uintptr_t nb);
+
+void			show_alloc_mem_dump(void *ptr);
+void			print_block_mem(t_block_mem *mem);
+void			ft_byte_dump_base(int8_t byte, char *output, int8_t base, int8_t flag_isprint);
 
 void			*memory_management_mutex(void *ptr, size_t size, size_t count, int8_t action);
 

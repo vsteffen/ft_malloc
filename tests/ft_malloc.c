@@ -60,19 +60,13 @@ int			main(int ac, char **av)
 	void	*ptr15;
 	void	*ptr16;
 
-	// ptr1 = malloc(259);
+	ptr1 = malloc(259);
 	ptr1 = malloc(19);
 	ptr2 = malloc(19);
-	ptr3 = malloc(19);
-	// ptr3 = malloc(1026);
-
-	printf("Addr ptr1 = %p\n", ptr1);
-	printf("Addr ptr2 = %p\n", ptr2);
-	printf("Addr ptr3 = %p\n", ptr3);
-	printf("Addr (uintmax_t)ptr1 = %jx\n", (uintmax_t)ptr1 % 16);
-	printf("Addr (uintmax_t)ptr2 = %lu\n", (uintptr_t)ptr2 % 16);
-	printf("Addr (uintmax_t)ptr3 = %jx\n", (uintmax_t)ptr3 % 16);
-	printf("Sizeof(uintptr_t) = %zu\n", sizeof(uintptr_t));
+	str1 = (char*)malloc(19);
+	strcpy(str1, "abcdefghijklmnopqrstuvxyzABCDEF");
+	str1[1] = (char)11;
+	show_alloc_mem_ex(str1);
 
 	// // EMACS
 	// ptr1 = malloc(8); // --> ptr1

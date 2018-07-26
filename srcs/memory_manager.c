@@ -35,18 +35,23 @@ void	*create_new_page(size_t size_requested, int8_t zone)
 	return (new_page);
 }
 
-void	*memory_management_mutex_3(void)
+void	*memory_management_mutex_3(void *ptr, int8_t action)
 {
 	size_t		total;
 
-	total = 0;
-	print_zone(g_mem[0], "TINY", &total);
-	print_zone(g_mem[1], "SMALL", &total);
-	print_zone(g_mem[2], "LARGE", &total);
-	ft_putstr("Total : ");
-	print_size(total);
-	ft_putstr(" octets\n");
-	pthread_mutex_unlock(&g_mutex);
+	if (action == 5)
+	{
+		total = 0;
+		print_zone(g_mem[0], "TINY", &total);
+		print_zone(g_mem[1], "SMALL", &total);
+		print_zone(g_mem[2], "LARGE", &total);
+		ft_putstr("Total : ");
+		print_size(total);
+		ft_putstr(" octets\n");
+		pthread_mutex_unlock(&g_mutex);
+	}
+	else
+		show_alloc_mem_dump(ptr);
 	return (NULL);
 }
 
@@ -72,7 +77,7 @@ void	*memory_management_mutex_2(void *ptr, size_t size, int8_t action)
 		pthread_mutex_unlock(&g_mutex);
 		return (ptr);
 	}
-	return (memory_management_mutex_3());
+	return (memory_management_mutex_3(ptr, action));
 }
 
 void	*memory_management_mutex(void *ptr, size_t size, size_t count, \

@@ -12,7 +12,7 @@
 
 #include "ft_malloc.h"
 
-uint8_t	count_numeral_base16_malloc(uintptr_t nb)
+uint8_t	ptoa_count_numeral_base16_malloc(uintptr_t nb)
 {
 	uint8_t		count;
 
@@ -24,11 +24,11 @@ uint8_t	count_numeral_base16_malloc(uintptr_t nb)
 
 void	ft_ptoa_base_malloc(uintptr_t nb, char *output)
 {
-	size_t		length;
+	uint8_t		length;
 	char		*alph;
 
 	alph = "0123456789ABCDEF";
-	length = (size_t)count_numeral_base16_malloc(nb);
+	length = ptoa_count_numeral_base16_malloc(nb);
 	output[length] = '\0';
 	while (nb != 0)
 	{
@@ -41,5 +41,49 @@ void	ft_ptoa_base_malloc(uintptr_t nb, char *output)
 		while (--length > 0)
 			output[length] = '0';
 		output[0] = '0';
+	}
+}
+
+int8_t		ft_byte_dump_base_length(int8_t *base, int8_t flag_isprint)
+{
+	if (*base == 10)
+	{
+		if (flag_isprint)
+			return (2);
+		return (3);
+	}
+	if (*base == 8)
+		return (3);
+	*base = 16;
+	return (1);
+}
+
+void	ft_byte_dump_base(int8_t byte, char *output, int8_t base, \
+	int8_t flag_isprint)
+{
+	int8_t		length;
+	char		*alph;
+
+	if (base == 10 && flag_isprint)
+	{
+		if (ft_isprint((int)byte))
+			output[0] = (char)byte;
+		else
+			output[0] = '.';
+		return ;
+	}
+	alph = "0123456789abcdef";
+	length = ft_byte_dump_base_length(&base, flag_isprint);
+	while (byte != 0)
+	{
+		output[length] = alph[byte % base];
+		byte /= base;
+		length--;
+	}
+	if (length >= 0)
+	{
+		output[length] = '0';
+		while (--length >= 0)
+			output[length] = '0';
 	}
 }
