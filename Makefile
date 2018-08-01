@@ -66,12 +66,7 @@ pre-check-lib:
 	@echo "Compile or verify lib"
 	@$(MAKE) $(LIBFT)
 
-$(NAME): $(OPATH) $(OBJ)
-	@echo "\n\033[33m\033[4m\033[1m → ft_malloc \"Make\"\033[0m"
-	@echo "Building $@"
-	@$(CC) -shared -o $@ $(CFLAGS) $(OBJ) $(LPATH) $(HPATH)
-	$(RM) -f libft_malloc.so
-	@ln -s $@ libft_malloc.so
+tests: $(NAME)
 	@echo "Generate tests"
 	@$(CC) -o "ft_malloc" tests/ft_malloc.c libft_malloc.so
 	@$(CC) -o test0 ./tests/test0.c
@@ -81,6 +76,16 @@ $(NAME): $(OPATH) $(OBJ)
 	@$(CC) -o test3.2 ./tests/test3.2.c
 	@$(CC) -o test4 ./tests/test4.c
 	@$(CC) -o test5 ./tests/test5.c libft_malloc.so
+	@echo "\033[32m ╔════════════════╗"
+	@echo " ║  All is done ! ║"
+	@echo " ╚════════════════╝\033[0m"
+
+$(NAME): $(OPATH) $(OBJ)
+	@echo "\n\033[33m\033[4m\033[1m → ft_malloc \"Make\"\033[0m"
+	@echo "Building $@"
+	@$(CC) -shared -o $@ $(CFLAGS) $(OBJ) $(LPATH) $(HPATH)
+	$(RM) -f libft_malloc.so
+	@ln -s $@ libft_malloc.so
 	@echo "\033[32m ╔════════════════╗"
 	@echo " ║  All is done ! ║"
 	@echo " ╚════════════════╝\033[0m"
