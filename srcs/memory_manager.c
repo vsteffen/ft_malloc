@@ -59,14 +59,14 @@ void	*memory_management_mutex_3(void *ptr, int8_t action)
 
 void	*memory_management_mutex_2(void *ptr, size_t size, int8_t action)
 {
-	if (action == 2) // malloc
+	if (action == 2)
 	{
 		add_alloc_history(2, NULL, size);
 		ptr = start_malloc(size);
 		pthread_mutex_unlock(&g_mutex);
 		return (ptr);
 	}
-	else if (action == 3) // realloc
+	else if (action == 3)
 	{
 		add_alloc_history(3, ptr, size);
 		ptr = start_realloc(ptr, size);
@@ -76,7 +76,7 @@ void	*memory_management_mutex_2(void *ptr, size_t size, int8_t action)
 	else if (action == 4)
 	{
 		add_alloc_history(4, ptr, size);
-		ptr = start_realloc(ptr, size); // reallocf
+		ptr = start_realloc(ptr, size);
 		if (ptr == NULL)
 			start_free(ptr);
 		pthread_mutex_unlock(&g_mutex);
@@ -89,15 +89,10 @@ void	*memory_management_mutex(void *ptr, size_t size, size_t count, \
 	int8_t action)
 {
 	t_block_mem		*new_mem;
-	static int8_t	init_env = 0;
 
 	pthread_mutex_lock(&g_mutex);
-	if (!init_env)
-	{
-		init_env = 1;
-		set_env_var(&g_env);
-	}
-	if (action == 0) // calloc
+	set_env_var();
+	if (action == 0)
 	{
 		add_alloc_history(0, NULL, count * size);
 		ptr = start_malloc(count * size);
@@ -108,7 +103,7 @@ void	*memory_management_mutex(void *ptr, size_t size, size_t count, \
 		pthread_mutex_unlock(&g_mutex);
 		return (ptr);
 	}
-	else if (action == 1) // free
+	else if (action == 1)
 	{
 		add_alloc_history(1, ptr, 0);
 		start_free(ptr);

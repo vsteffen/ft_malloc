@@ -1,6 +1,19 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   malloc.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vsteffen <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/08/01 22:58:10 by vsteffen          #+#    #+#             */
+/*   Updated: 2018/08/01 22:58:12 by vsteffen         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "ft_malloc.h"
 
-void			*find_next_mem_large(t_block_mem *mem, size_t size_requested) {
+void		*find_next_mem_large(t_block_mem *mem, size_t size_requested)
+{
 	void		*new_alloc_large;
 	t_block_mem	*before;
 
@@ -14,10 +27,36 @@ void			*find_next_mem_large(t_block_mem *mem, size_t size_requested) {
 	return (new_alloc_large);
 }
 
-void			*find_next_mem_tn_sm(t_block_mem *mem, size_t size_requested, int8_t zone) {
+void		*check_for_reuse_of_hole(t_block_mem *mem, size_t size_requested)
+{
+	t_block_mem		*new_space_free;
+
+	if (mem->used == 0)
+	{
+		if (mem->size >= size_requested)
+		{
+			mem->used = 1;
+			if (mem->size >= size_requested + sizeof(t_block_mem))
+			{
+				new_space_free = (t_block_mem*)\
+					((void *)mem + sizeof(t_block_mem) + size_requested);
+				set_metadata(new_space_free, mem->size - \
+					(sizeof(t_block_mem) + size_requested), mem->next);
+				set_metadata_next_block(mem, new_space_free);
+				new_space_free->used = 0;
+				mem->size = size_requested;
+			}
+			return ((void*)mem);
+		}
+	}
+	return (NULL);
+}
+
+void		*find_next_mem_tn_sm(t_block_mem *mem, size_t size_requested, \
+	int8_t zone)
+{
 	void			*next_alloc;
 	t_block_mem		*before;
-	t_block_mem		*new_space_free;
 	size_t			size_page;
 	size_t			size_used_total;
 
@@ -29,39 +68,18 @@ void			*find_next_mem_tn_sm(t_block_mem *mem, size_t size_requested, int8_t zone
 	{
 		if (mem->new_page == 1)
 			size_used_total = 0;
-		if (mem->used == 0)
-		{
-			if (mem->size >= size_requested)
-			{
-				mem->used = 1;
-				if (mem->size >= size_requested + sizeof(t_block_mem)) // if we have space enough to create free page after the part reuse of this one
-				{
-					new_space_free = (t_block_mem*)((void *)mem + sizeof(t_block_mem) + size_requested);
-					set_metadata(new_space_free, mem->size - (sizeof(t_block_mem) + size_requested), mem->next);
-					set_metadata_next_block(mem, new_space_free);
-					new_space_free->used = 0;
-					mem->size = size_requested;
-				}
-				return ((void*)mem);
-			}
-		}
+		if ((next_alloc = check_for_reuse_of_hole(mem, size_requested)))
+			return (next_alloc);
 		size_used_total += mem->size + sizeof(t_block_mem);
 		before = mem;
 		mem = mem->next;
 	}
 	if (size_used_total + size_requested + sizeof(t_block_mem) > size_page)
-	{
-		next_alloc = create_new_page(size_requested, zone);
-		set_metadata_next_block(before, (t_block_mem *)next_alloc);
-		return (next_alloc);
-	}
-	next_alloc = (void *)before + sizeof(t_block_mem) + before->size;
-	set_metadata((t_block_mem*)next_alloc, size_requested, NULL);
-	set_metadata_next_block(before, (t_block_mem*)next_alloc);
-	return (next_alloc);
+		return (filled_zone(size_requested, before, zone));
+	return (unfilled_zone(size_requested, before));
 }
 
-void			*start_malloc(size_t size)
+void		*start_malloc(size_t size)
 {
 	void			*alloc_requested;
 	t_block_mem		**mem;
@@ -88,7 +106,8 @@ void			*start_malloc(size_t size)
 	return (alloc_requested + sizeof(t_block_mem));
 }
 
-void			*malloc(size_t size) {
+void		*malloc(size_t size)
+{
 	void	*new_alloc;
 
 	new_alloc = memory_management_mutex(NULL, size, 0, 2);

@@ -17,25 +17,30 @@ pthread_mutex_t	g_mutex = PTHREAD_MUTEX_INITIALIZER;
 t_histo_global	*g_history = NULL;
 int8_t			g_env = 0;
 
-void			set_env_var(int8_t *g_env)
+void			set_env_var(void)
 {
-	const char	*verbose = getenv("FT_MALLOC_VERBOSE");
-	const char	*history = getenv("FT_MALLOC_HISTORY");
+	static int8_t	init_env = 0;
+	int8_t			*global;
+	char			*verbose;
+	char			*history;
 
-	if (verbose)
+	if (init_env == 0)
 	{
-		if (ft_strcmp(verbose, "1") == 0 || ft_strcmp(verbose, "y") == 0 || \
-			ft_strcmp(verbose, "yes") == 0)
+		global = &g_env;
+		init_env = 1;
+		verbose = getenv("FT_MALLOC_VERBOSE");
+		if (verbose)
 		{
-			*g_env = 1;
+			if (ft_strcmp(verbose, "1") == 0 || ft_strcmp(verbose, "y") == 0 ||\
+				ft_strcmp(verbose, "yes") == 0)
+				*global = 1;
 		}
-	}
-	if (history)
-	{
-		if (ft_strcmp(history, "1") == 0 || ft_strcmp(history, "y") == 0 || \
-			ft_strcmp(history, "yes") == 0)
+		history = getenv("FT_MALLOC_HISTORY");
+		if (history)
 		{
-			*g_env = *g_env | (1 << 1);
+			if (ft_strcmp(history, "1") == 0 || ft_strcmp(history, "y") == 0 ||\
+				ft_strcmp(history, "yes") == 0)
+				*global = *global | (1 << 1);
 		}
 	}
 }

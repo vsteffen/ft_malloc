@@ -39,6 +39,7 @@ LPATH	=	$(LIBFT)/libft.a -lpthread
 HPATH 	=	-I $(ROOT)/includes -I $(LIBFT)/includes
 
 SRC =	malloc.c \
+	malloc_2.c \
 	realloc.c \
 	calloc.c \
 	free.c \

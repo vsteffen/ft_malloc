@@ -27,9 +27,9 @@ void			print_addr(void *ptr)
 	ft_ptoa_base_malloc(uip, output);
 	ft_putstr(output);
 	if (munmap((void*)output, get_size_page(length, 2)) == 0)
-		(void)ptr; // success
+		(void)ptr;
 	else
-		(void)ptr; // failed
+		(void)ptr;
 }
 
 void			print_size(size_t n)

@@ -36,7 +36,7 @@ void		print_debug_free(void *ptr)
 	}
 }
 
-void		print_debug_malloc(size_t size , void *new_alloc)
+void		print_debug_malloc(size_t size, void *new_alloc)
 {
 	if ((g_env & 1) == 1)
 	{

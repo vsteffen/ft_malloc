@@ -12,50 +12,13 @@
 
 #include "ft_malloc.h"
 
-static void	ft_ptoa_base_show_ex(uintptr_t nb, char *output)
-{
-	uint8_t		length;
-	char		*alph;
-
-	alph = "0123456789ABCDEF";
-	length = 16;
-	while (nb != 0)
-	{
-		length--;
-		output[length] = alph[nb % 16];
-		nb /= 16;
-	}
-	if (length > 0)
-	{
-		while (--length > 0)
-			output[length] = '0';
-		output[0] = '0';
-	}
-}
-
-void		print_memory_user(t_block_mem *mem)
+void		print_memory_user(t_block_mem *mem, char *output, size_t size_read)
 {
 	int8_t	*data;
-	char	*output;
-	size_t	size_read;
 	uint8_t	i;
 	uint8_t	j;
 
 	data = (int8_t*)(((void*)(mem)) + sizeof(t_block_mem));
-	output = (char*)mmap(0, \
-		get_size_page(96, 2),
-		PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
-	if ((void*)output == MAP_FAILED)
-		return ;
-	ft_ptoa_base_show_ex((uintptr_t)data, output);
-	output[16] = ' ';
-	output[17] = ' ';
-	output[42] = ' ';
-	output[67] = ' ';
-	output[68] = '|';
-	output[85] = '|';
-	output[86] = '\n';
-	output[87] = '\0';
 	size_read = 0;
 	while (mem->size > size_read)
 	{
@@ -76,46 +39,67 @@ void		print_memory_user(t_block_mem *mem)
 		size_read += 16;
 		data = data + 16;
 	}
-	if (munmap(output, get_size_page(96, 2)) == 0)
-		(void)data; // success
-	else
-		(void)data; // failed
+}
+
+void		prepare_output(char *output)
+{
+	output[16] = ' ';
+	output[17] = ' ';
+	output[42] = ' ';
+	output[67] = ' ';
+	output[68] = '|';
+	output[85] = '|';
+	output[86] = '\n';
+	output[87] = '\0';
+}
+
+void		print_all_memory_user(char *output)
+{
+	t_block_mem		*mem;
+	int8_t			i;
+
+	i = 0;
+	while (i < 3)
+	{
+		mem = g_mem[i];
+		while (mem)
+		{
+			if (mem->used == 1)
+			{
+				print_block_mem(mem);
+				print_memory_user(mem, output, 0);
+			}
+			mem = mem->next;
+		}
+		i++;
+	}
 }
 
 void		show_alloc_mem_dump(void *ptr)
 {
 	t_block_mem		*mem;
-	int8_t			i;
+	char			*output;
 
-	if (ptr)
+	output = (char*)mmap(0, get_size_page(96, 2),
+		PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
+	if ((void*)output == MAP_FAILED)
+		return ;
+	prepare_output(output);
+	if (ptr && isset_addr_and_get_previous(ptr))
 	{
-		if (isset_addr_and_get_previous(ptr) == NULL)
-			return ;
 		mem = (t_block_mem *)(ptr - sizeof(t_block_mem));
 		print_block_mem(mem);
-		print_memory_user(mem);
+		print_memory_user(mem, output, 0);
 	}
 	else
-	{
-		i = 0;
-		while (i < 3)
-		{
-			mem = g_mem[i];
-			while (mem)
-			{
-				if (mem->used == 1)
-				{
-					print_block_mem(mem);
-					print_memory_user(mem);
-				}
-				mem = mem->next;
-			}
-			i++;
-		}
-	}
+		print_all_memory_user(output);
+	if (munmap(output, get_size_page(96, 2)) == 0)
+		(void)ptr;
+	else
+		(void)ptr;
 }
 
-void			show_alloc_mem_ex(void *ptr)
+void		show_alloc_mem_ex(void *ptr)
 {
 	memory_management_mutex(ptr, 0, 0, 6);
 }
