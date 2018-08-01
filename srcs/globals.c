@@ -19,17 +19,23 @@ int8_t			g_env = 0;
 
 void			set_env_var(int8_t *g_env)
 {
-	const char	*var_env = getenv("FT_MALLOC_VERBOSE");
+	const char	*verbose = getenv("FT_MALLOC_VERBOSE");
+	const char	*history = getenv("FT_MALLOC_HISTORY");
 
-	if (var_env)
+	if (verbose)
 	{
-		if (ft_strcmp(var_env, "1") == 0 || ft_strcmp(var_env, "y") == 0 || \
-			ft_strcmp(var_env, "yes") == 0)
+		if (ft_strcmp(verbose, "1") == 0 || ft_strcmp(verbose, "y") == 0 || \
+			ft_strcmp(verbose, "yes") == 0)
 		{
 			*g_env = 1;
-			return ;
 		}
 	}
-	*g_env = 0;
-	return ;
+	if (history)
+	{
+		if (ft_strcmp(history, "1") == 0 || ft_strcmp(history, "y") == 0 || \
+			ft_strcmp(history, "yes") == 0)
+		{
+			*g_env = *g_env | (1 << 1);
+		}
+	}
 }

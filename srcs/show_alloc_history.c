@@ -4,28 +4,31 @@ void		add_alloc_history(int8_t action, void *ptr, size_t size)
 {
 	t_histo_mem		*history;
 
-	history = (t_histo_mem*)mmap(0, get_size_page(sizeof(t_histo_mem), 2), \
-			PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
-	if ((void*)history == MAP_FAILED)
-		return ;
-	history->action = action;
-	history->ptr = ptr;
-	history->size = size;
-	history->next = NULL;
-	if (!g_history)
+	if ((g_env & (1 << 1)) == (1 << 1))
 	{
-		g_history = (t_histo_global*)mmap(0, get_size_page(\
-			sizeof(t_histo_global), 2), \
-			PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
-		if ((void*)g_history == MAP_FAILED)
+		history = (t_histo_mem*)mmap(0, get_size_page(sizeof(t_histo_mem), 2), \
+				PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
+		if ((void*)history == MAP_FAILED)
 			return ;
-		g_history->start = history;
-		g_history->end = history;
-	}
-	else
-	{
-		g_history->end->next = history;
-		g_history->end = history;
+		history->action = action;
+		history->ptr = ptr;
+		history->size = size;
+		history->next = NULL;
+		if (!g_history)
+		{
+			g_history = (t_histo_global*)mmap(0, get_size_page(\
+				sizeof(t_histo_global), 2), \
+				PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
+			if ((void*)g_history == MAP_FAILED)
+				return ;
+			g_history->start = history;
+			g_history->end = history;
+		}
+		else
+		{
+			g_history->end->next = history;
+			g_history->end = history;
+		}
 	}
 }
 
@@ -35,6 +38,8 @@ void		print_history(void)
 	size_t			id;
 	int8_t			action;
 
+	if (!g_history)
+		return ;
 	history = g_history->start;
 	id = 1;
 	while (history)
