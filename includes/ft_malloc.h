@@ -21,7 +21,6 @@
 
 # define TINY 128
 # define SMALL 1024
-# define DEBUG 0
 
 typedef struct			s_block_mem {
 	uintptr_t			mem_align;
@@ -38,9 +37,15 @@ typedef struct			s_histo_mem {
 	struct s_histo_mem	*next;
 }						t_histo_mem;
 
+typedef struct			s_histo_global {
+	struct s_histo_mem	*start;
+	struct s_histo_mem	*end;
+}						t_histo_global;
+
 extern			t_block_mem		*g_mem[3];
 extern			pthread_mutex_t	g_mutex;
-extern			t_histo_mem		*g_history;
+extern			t_histo_global	*g_history;
+extern			int8_t			g_env;
 
 void			free(void *ptr);
 void			*malloc(size_t size);
@@ -52,7 +57,6 @@ int8_t			get_zone(size_t size_requested);
 void			set_metadata(t_block_mem *mem, size_t size_requested, t_block_mem *next_block);
 void			set_metadata_next_block(t_block_mem *mem, t_block_mem *next_block);
 void			*create_new_page(size_t size_requested, int8_t zone);
-
 
 t_block_mem		*isset_addr_and_get_previous(void *ptr);
 void			*mutex_unlock_with_ptr(void *ptr);
@@ -70,15 +74,17 @@ uint8_t			ptoa_count_numeral_base16_malloc(uintptr_t nb);
 void			show_alloc_mem_dump(void *ptr);
 void			print_block_mem(t_block_mem *mem);
 void			ft_byte_dump_base(int8_t byte, char *output, int8_t base, int8_t flag_isprint);
+void			set_env_var(int8_t *g_env);
 
 void			*memory_management_mutex(void *ptr, size_t size, size_t count, int8_t action);
 
 void			print_size(size_t n);
 void			print_addr(void *ptr);
 
-void			print_debug_size_t(size_t debug, char *name);
-void			print_debug_addr(void *debug, char *name);
-void			print_debugf_size_t(size_t debug, char *name);
-void			print_debugf_addr(void *debug, char *name);
+void			print_debug_calloc(size_t size, size_t count, void *new_alloc);
+void			print_debug_free(void *ptr);
+void			print_debug_malloc(size_t size , void *new_alloc);
+void			print_debug_realloc(void *ptr, size_t size, void *new_alloc);
+void			print_debug_reallocf(void *ptr, size_t size, void *new_alloc);
 
 #endif

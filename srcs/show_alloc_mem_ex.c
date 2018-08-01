@@ -103,8 +103,11 @@ void		show_alloc_mem_dump(void *ptr)
 			mem = g_mem[i];
 			while (mem)
 			{
-				print_block_mem(mem);
-				print_memory_user(mem);
+				if (mem->used == 1)
+				{
+					print_block_mem(mem);
+					print_memory_user(mem);
+				}
 				mem = mem->next;
 			}
 			i++;

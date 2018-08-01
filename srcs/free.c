@@ -48,7 +48,8 @@ void	start_free(void *ptr)
 	}
 }
 
-void	free(void *ptr) {
-	add_alloc_history(1, ptr, 0);
+void	free(void *ptr)
+{
+	print_debug_free(ptr);
 	memory_management_mutex(ptr, 0, 0, 1);
 }

@@ -83,13 +83,15 @@ void			*start_malloc(size_t size)
 		else
 			alloc_requested = find_next_mem_large(*mem, size);
 	}
-	print_debug_addr(alloc_requested + sizeof(t_block_mem), "Malloc ptr return");
 	if (alloc_requested == NULL)
 		return (NULL);
 	return (alloc_requested + sizeof(t_block_mem));
 }
 
 void			*malloc(size_t size) {
-	add_alloc_history(2, NULL, size);
-	return (memory_management_mutex(NULL, size, 0, 2));
+	void	*new_alloc;
+
+	new_alloc = memory_management_mutex(NULL, size, 0, 2);
+	print_debug_malloc(size, new_alloc);
+	return (new_alloc);
 }

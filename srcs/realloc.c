@@ -40,8 +40,6 @@ void	*start_realloc(void *ptr, size_t size)
 {
 	t_block_mem		*mem;
 
-	print_debug_addr(ptr, "Realloc address");
-	print_debug_size_t(size, "Realloc size");
 	if (!ptr)
 	{
 		return (start_malloc(size));
@@ -69,12 +67,18 @@ void	*start_realloc(void *ptr, size_t size)
 }
 
 void	*realloc(void *ptr, size_t size) {
-	add_alloc_history(3, ptr, size);
-	return (memory_management_mutex(ptr, size, 0, 3));
+	void	*new_alloc;
+
+	new_alloc = memory_management_mutex(ptr, size, 0, 3);
+	print_debug_realloc(ptr, size, new_alloc);
+	return (new_alloc);
 }
 
 void	*reallocf(void *ptr, size_t size)
 {
-	add_alloc_history(4, ptr, size);
-	return (memory_management_mutex(ptr, size, 0, 4));
+	void	*new_alloc;
+
+	new_alloc = memory_management_mutex(ptr, size, 0, 4);
+	print_debug_reallocf(ptr, size, new_alloc);
+	return (new_alloc);
 }
